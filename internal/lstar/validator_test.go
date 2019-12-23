@@ -6,22 +6,22 @@ import (
 )
 
 func TestNotExistFile(t *testing.T) {
-	path := "../data/NotExistFile.tar"
+	path := "../../test/NotExistFile.tar"
 	assert.Error(t, Validate(path))
 }
 
 func TestNotReadableFile(t *testing.T) {
-	path := "../data/NotReadableFile.tar"
+	path := "../../test/NotReadableFile.tar"
 	assert.Error(t, Validate(path))
 }
 
 func TestNotTarFile(t *testing.T) {
-	path := "../data"
+	path := "../../test"
 	assert.Error(t, Validate(path))
 }
 
 func TestGzButNotTarFile(t *testing.T) {
-	path := "../data/GzButNotTarFile.txt.gz"
+	path := "../../test/GzButNotTarFile.txt.gz"
 	assert.Error(t, Validate(path))
 }
 
