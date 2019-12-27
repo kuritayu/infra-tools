@@ -1,4 +1,4 @@
-package lstar
+package pkg
 
 import (
 	"errors"
@@ -15,7 +15,7 @@ const (
 	FileIsNotTar      = " is not tar file."
 )
 
-func Validate(path string) error {
+func ValidateFile(path string) error {
 
 	_, err := os.Stat(path)
 
@@ -31,6 +31,10 @@ func Validate(path string) error {
 	}
 	defer file.Close()
 
+	return nil
+}
+
+func ValidateTar(path string) error {
 	// check file is tar or tar.gz
 	e := filepath.Ext(path)
 	if e != ".tar" && e != ".gz" {
@@ -43,7 +47,6 @@ func Validate(path string) error {
 			return errors.New(errorMsg(FileIsNotTar, path))
 		}
 	}
-
 	return nil
 }
 
