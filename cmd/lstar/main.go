@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/urfave/cli"
 	"infra-tools/internal/lstar"
+	"infra-tools/pkg"
 	"os"
 )
 
@@ -21,7 +22,13 @@ func main() {
 		}
 
 		target := c.Args().Get(0)
-		err := lstar.Validate(target)
+		err := pkg.ValidateFile(target)
+		if err != nil {
+			_, _ = fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+
+		err = pkg.ValidateTar(target)
 		if err != nil {
 			_, _ = fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
