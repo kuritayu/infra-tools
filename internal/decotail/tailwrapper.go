@@ -2,8 +2,12 @@ package decotail
 
 import (
 	"fmt"
+	"github.com/aybabtme/color/brush"
 	"github.com/hpcloud/tail"
+	"strings"
 )
+
+const DATETIMEFORMAT = "2006-01-02 15:04:05.000"
 
 type TailWrapper struct {
 	path      string
@@ -26,12 +30,24 @@ func (t *TailWrapper) Execute() error {
 	}
 
 	for line := range tf.Lines {
-		//TODO timestampフラグ対応
-		//TODO keywordフラグ対応
-		fmt.Println(line.Text)
+		if t.timestamp {
+			fmt.Println(line.Time.Format(DATETIMEFORMAT),
+				line.Time.Unix(),
+				t.convertToColor(line.Text))
+		} else {
+			fmt.Println(t.convertToColor(line.Text))
+		}
 		//TODO シグナル受信時の挙動
 		//シグナル受信したらループを抜けて、そのままnil返却
 	}
 
 	return nil
+}
+
+func (t *TailWrapper) convertToColor(text string) string {
+	//TODO 複数キーワードに対応する
+	if t.keyword != "" && strings.Contains(text, t.keyword) {
+		return strings.ReplaceAll(text, t.keyword, fmt.Sprint(brush.Red(t.keyword)))
+	}
+	return text
 }
