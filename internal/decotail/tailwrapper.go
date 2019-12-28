@@ -30,13 +30,7 @@ func (t *TailWrapper) Execute() error {
 	}
 
 	for line := range tf.Lines {
-		if t.timestamp {
-			fmt.Println(line.Time.Format(DATETIMEFORMAT),
-				line.Time.Unix(),
-				t.convertToColor(line.Text))
-		} else {
-			fmt.Println(t.convertToColor(line.Text))
-		}
+		fmt.Print(t.decision(line))
 		//TODO シグナル受信時の挙動
 		//シグナル受信したらループを抜けて、そのままnil返却
 	}
@@ -50,4 +44,13 @@ func (t *TailWrapper) convertToColor(text string) string {
 		return strings.ReplaceAll(text, t.keyword, fmt.Sprint(brush.Red(t.keyword)))
 	}
 	return text
+}
+
+func (t *TailWrapper) decision(line *tail.Line) string {
+	if t.timestamp {
+		return fmt.Sprintln(line.Time.Format(DATETIMEFORMAT),
+			line.Time.Unix(),
+			t.convertToColor(line.Text))
+	}
+	return fmt.Sprintln(t.convertToColor(line.Text))
 }
