@@ -2,8 +2,9 @@ package decotail
 
 import (
 	"fmt"
-	"github.com/aybabtme/color/brush"
 	"github.com/hpcloud/tail"
+	"os"
+	"os/signal"
 	"strings"
 )
 
@@ -29,21 +30,26 @@ func (t *TailWrapper) Execute() error {
 		return err
 	}
 
-	for line := range tf.Lines {
-		fmt.Print(t.decision(line))
-		//TODO シグナル受信時の挙動
-		//シグナル受信したらループを抜けて、そのままnil返却
-	}
+	go func() {
+		for line := range tf.Lines {
+			fmt.Print(t.decision(line))
+		}
+	}()
+
+	quit := make(chan os.Signal)
+	signal.Notify(quit, os.Interrupt)
+	<-quit
 
 	return nil
 }
 
 func (t *TailWrapper) convertToColor(text string) string {
-	//TODO 複数キーワードに対応する
-	if t.keyword != "" && strings.Contains(text, t.keyword) {
-		return strings.ReplaceAll(text, t.keyword, fmt.Sprint(brush.Red(t.keyword)))
+	keywords := strings.Split(t.keyword, " ")
+	for index, kw := range keywords {
+		text = strings.ReplaceAll(text, kw, DefineColor(index, kw))
 	}
 	return text
+
 }
 
 func (t *TailWrapper) decision(line *tail.Line) string {
