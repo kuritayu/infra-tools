@@ -36,7 +36,7 @@ func receiver(cl *Client) {
 			go send(makeMsgForAdmin(string(cl.name) + " Quit."))
 			break
 		}
-		go send(makeMsg(buf[:n], cl))
+		go send(makeMsg(buf[:n], cl.name, cl.color))
 		buf = make([]byte, 560)
 	}
 }
@@ -72,24 +72,6 @@ func Close(c io.Closer) {
 	}
 }
 
-func SprintColor(msg string, color int) string {
-	return fmt.Sprintf("\x1b[%dm%s\x1b[0m", color, msg)
-}
-
-func getTime() string {
-	return time.Now().Format("15:04")
-}
-
-func makeMsg(msg []byte, cl *Client) []byte {
-	template := fmt.Sprintf("%s[%s] %s", getTime(), cl.name, string(msg))
-	return []byte(SprintColor(template, cl.color))
-}
-
-func makeMsgForAdmin(msg string) []byte {
-	template := fmt.Sprintf("(%s) %s", getTime(), msg)
-	return []byte(SprintColor(template, 31))
-}
-
 func ServerExecute() {
 	service := ":7777"
 	tcpAddr, err := net.ResolveTCPAddr("tcp4", service)
@@ -104,6 +86,7 @@ func ServerExecute() {
 		}
 
 		//TODO createClientをシンプルにしたので、Executeの処理が多くなっている
+		//TODO stringとbyteが混在していて見にくい、送信するときだけbyte、それ以外は常にstringでやりたい
 		cl := createClient(conn)
 		clientList = append(clientList, cl)
 		send(makeMsgForAdmin(string(cl.name) + " joined!!"))
