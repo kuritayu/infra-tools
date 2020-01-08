@@ -2,7 +2,6 @@ package tchat
 
 import (
 	"fmt"
-	"github.com/edo1z/go_simple_chat/util"
 	"net"
 )
 
@@ -11,6 +10,8 @@ type Client struct {
 	conn  net.Conn
 	color int
 }
+
+const PORT = ":7777"
 
 var clientList []*Client
 
@@ -31,25 +32,25 @@ func receiver(cl *Client) {
 			go send(makeMsgForAdmin(string(cl.name) + " Quit."))
 			break
 		}
+		//TODO チャネル化
 		go send(makeMsg(buf[:n], cl.name, cl.color))
 		buf = makeBuffer()
 	}
 }
 
-func createClient(conn net.Conn) *Client {
+func createClient(conn net.Conn, name []byte) *Client {
 	return &Client{
-		name:  getName(conn),
+		name:  name,
 		conn:  conn,
 		color: getColor(),
 	}
 }
 
 func ServerExecute() {
-	service := ":7777"
-	tcpAddr, err := net.ResolveTCPAddr("tcp4", service)
-	util.ChkErr(err, "tcpaddr")
+	tcpAddr, err := net.ResolveTCPAddr("tcp4", PORT)
+	ChkErr(err, "tcpaddr")
 	li, err := net.ListenTCP("tcp", tcpAddr)
-	util.ChkErr(err, "tcpaddr")
+	ChkErr(err, "tcpaddr")
 	for {
 		conn, err := li.Accept()
 		if err != nil {
@@ -60,7 +61,9 @@ func ServerExecute() {
 		//TODO createClientをシンプルにしたので、Executeの処理が多くなっている
 		//TODO stringとbyteが混在していて見にくい、送信するときだけbyte、それ以外は常にstringでやりたい
 		//TODO 関数から別関数をgoroutineしているため、非常にわかりにくい、テストしにくい
-		cl := createClient(conn)
+		//TODO getNameはここで実行して、createClientの引数に渡したい
+		name := getName(conn)
+		cl := createClient(conn, name)
 		clientList = append(clientList, cl)
 		send(makeMsgForAdmin(string(cl.name) + " joined!!"))
 		go receiver(cl)

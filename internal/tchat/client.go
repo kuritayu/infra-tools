@@ -3,7 +3,6 @@ package tchat
 import (
 	"bufio"
 	"fmt"
-	"github.com/edo1z/go_simple_chat/util"
 	"io"
 	"net"
 	"os"
@@ -21,7 +20,7 @@ func sender(conn net.Conn) {
 			break
 		}
 		_, err := conn.Write(input)
-		util.ChkErr(err, "sender write")
+		ChkErr(err, "sender write")
 	}
 }
 
@@ -29,7 +28,7 @@ func reflector(conn net.Conn) {
 	buf := makeBuffer()
 	for running == true {
 		n, err := conn.Read(buf)
-		util.ChkErr(err, "Receiver read")
+		ChkErr(err, "Receiver read")
 		fmt.Println(string(buf[:n]))
 		buf = makeBuffer()
 	}
@@ -49,14 +48,14 @@ func ClientExecute() {
 
 	host := "127.0.0.1:7777"
 	tcpAddr, err := net.ResolveTCPAddr("tcp4", host)
-	util.ChkErr(err, "tcpAddr")
+	ChkErr(err, "tcpAddr")
 
 	conn, err := net.DialTCP("tcp", nil, tcpAddr)
-	util.ChkErr(err, "DialTCP")
+	ChkErr(err, "DialTCP")
 	defer Teardown(conn)
 
 	_, err = conn.Write(name)
-	util.ChkErr(err, "Write name")
+	ChkErr(err, "Write name")
 
 	go reflector(conn)
 	go sender(conn)
