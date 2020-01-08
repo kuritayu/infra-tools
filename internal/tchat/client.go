@@ -26,12 +26,12 @@ func sender(conn net.Conn) {
 }
 
 func reflector(conn net.Conn) {
-	buf := make([]byte, 560)
+	buf := makeBuffer()
 	for running == true {
 		n, err := conn.Read(buf)
 		util.ChkErr(err, "Receiver read")
 		fmt.Println(string(buf[:n]))
-		buf = make([]byte, 560)
+		buf = makeBuffer()
 	}
 }
 
