@@ -43,8 +43,8 @@ func getTime() string {
 	return time.Now().Format("15:04")
 }
 
-func makeMsg(msg []byte, name string, color int) []byte {
-	template := fmt.Sprintf("%s[%s] %s", getTime(), name, string(msg))
+func makeMsg(msg string, name string, color int) []byte {
+	template := fmt.Sprintf("%s[%s] %s", getTime(), name, msg)
 	return []byte(SprintColor(template, color))
 }
 

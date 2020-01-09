@@ -29,11 +29,11 @@ func receiver(cl *Client) {
 	for {
 		n, err := cl.conn.Read(buf)
 		if err != nil {
-			go send(makeMsg([]byte("Quit."), cl.name, RED))
+			go send(makeMsg("Quit.", cl.name, RED))
 			break
 		}
 		//TODO チャネル化
-		go send(makeMsg(buf[:n], cl.name, cl.color))
+		go send(makeMsg(string(buf[:n]), cl.name, cl.color))
 		buf = makeBuffer()
 	}
 }
@@ -65,7 +65,7 @@ func ServerExecute() {
 		name := getName(conn)
 		cl := createClient(conn, name)
 		clientList = append(clientList, cl)
-		send(makeMsg([]byte("joined!!"), cl.name, RED))
+		send(makeMsg("joined!!", cl.name, RED))
 		go receiver(cl)
 	}
 }
