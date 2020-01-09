@@ -6,7 +6,7 @@ import (
 )
 
 type Client struct {
-	name  []byte
+	name  string
 	conn  net.Conn
 	color int
 }
@@ -29,7 +29,7 @@ func receiver(cl *Client) {
 	for {
 		n, err := cl.conn.Read(buf)
 		if err != nil {
-			go send(makeMsgForAdmin(string(cl.name) + " Quit."))
+			go send(makeMsg([]byte("Quit."), cl.name, RED))
 			break
 		}
 		//TODO チャネル化
@@ -38,7 +38,7 @@ func receiver(cl *Client) {
 	}
 }
 
-func createClient(conn net.Conn, name []byte) *Client {
+func createClient(conn net.Conn, name string) *Client {
 	return &Client{
 		name:  name,
 		conn:  conn,
@@ -65,7 +65,7 @@ func ServerExecute() {
 		name := getName(conn)
 		cl := createClient(conn, name)
 		clientList = append(clientList, cl)
-		send(makeMsgForAdmin(string(cl.name) + " joined!!"))
+		send(makeMsg([]byte("joined!!"), cl.name, RED))
 		go receiver(cl)
 	}
 }

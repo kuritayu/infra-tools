@@ -23,17 +23,17 @@ const (
 func SprintColor(msg string, color int) string {
 	switch color {
 	case RED:
-		return brush.Red(msg).String()
+		return brush.DarkRed(msg).String()
 	case GREEN:
-		return brush.Green(msg).String()
+		return brush.DarkGreen(msg).String()
 	case YELLOW:
-		return brush.Yellow(msg).String()
+		return brush.DarkYellow(msg).String()
 	case BLUE:
-		return brush.Blue(msg).String()
+		return brush.DarkBlue(msg).String()
 	case PURPLE:
-		return brush.Purple(msg).String()
+		return brush.DarkPurple(msg).String()
 	case CYAN:
-		return brush.Cyan(msg).String()
+		return brush.DarkCyan(msg).String()
 	default:
 		return msg
 	}
@@ -43,14 +43,9 @@ func getTime() string {
 	return time.Now().Format("15:04")
 }
 
-func makeMsg(msg []byte, name []byte, color int) []byte {
+func makeMsg(msg []byte, name string, color int) []byte {
 	template := fmt.Sprintf("%s[%s] %s", getTime(), name, string(msg))
 	return []byte(SprintColor(template, color))
-}
-
-func makeMsgForAdmin(msg string) []byte {
-	template := fmt.Sprintf("(%s) %s", getTime(), msg)
-	return []byte(SprintColor(template, 31))
 }
 
 func makeBuffer() []byte {
@@ -63,7 +58,7 @@ func getColor() int {
 	return colorList[rand.Intn(5)]
 }
 
-func getName(conn net.Conn) []byte {
+func getName(conn net.Conn) string {
 	buf := makeBuffer()
 	n, err := conn.Read(buf)
 	if err != nil {
@@ -72,7 +67,7 @@ func getName(conn net.Conn) []byte {
 		Close(conn)
 		os.Exit(1)
 	}
-	return buf[:n]
+	return string(buf[:n])
 }
 
 //TODO このメソッド不要の可能性高い
