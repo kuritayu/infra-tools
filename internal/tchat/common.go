@@ -2,6 +2,7 @@ package tchat
 
 import (
 	"fmt"
+	"github.com/aybabtme/color/brush"
 	"io"
 	"math/rand"
 	"net"
@@ -9,10 +10,33 @@ import (
 	"time"
 )
 
-const BUFFERLENGTH = 560
+const (
+	BUFFERLENGTH = 560
+	RED          = 31
+	GREEN        = 32
+	YELLOW       = 33
+	BLUE         = 34
+	PURPLE       = 35
+	CYAN         = 36
+)
 
 func SprintColor(msg string, color int) string {
-	return fmt.Sprintf("\x1b[%dm%s\x1b[0m", color, msg)
+	switch color {
+	case RED:
+		return brush.Red(msg).String()
+	case GREEN:
+		return brush.Green(msg).String()
+	case YELLOW:
+		return brush.Yellow(msg).String()
+	case BLUE:
+		return brush.Blue(msg).String()
+	case PURPLE:
+		return brush.Purple(msg).String()
+	case CYAN:
+		return brush.Cyan(msg).String()
+	default:
+		return msg
+	}
 }
 
 func getTime() string {
@@ -62,7 +86,7 @@ func Close(c io.Closer) {
 func ChkErr(err error, place string) {
 	if err != nil {
 		fmt.Printf("(%s)", place)
-		fmt.Fprintf(os.Stderr, "%s", err.Error())
+		_, _ = fmt.Fprintf(os.Stderr, "%s", err.Error())
 		os.Exit(0)
 	}
 }
