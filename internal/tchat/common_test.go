@@ -1,6 +1,7 @@
 package tchat
 
 import (
+	"fmt"
 	"github.com/aybabtme/color/brush"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -41,5 +42,20 @@ func TestSprintColor(t *testing.T) {
 func TestGetTime(t *testing.T) {
 	actual := getTime()
 	expected := time.Now().Format("15:04")
+	assert.Equal(t, expected, actual)
+}
+
+func TestMakeMsg(t *testing.T) {
+	now := getTime()
+	name := "TEST-USER"
+	msg := "Hello."
+	actual := makeMsg(msg, name, GREEN)
+	expected := []byte(brush.DarkGreen(fmt.Sprintf("%s[%s] %s", now, name, msg)).String())
+	assert.Equal(t, expected, actual)
+}
+
+func TestMakeBuffer(t *testing.T) {
+	actual := makeBuffer()
+	expected := make([]byte, 560)
 	assert.Equal(t, expected, actual)
 }
