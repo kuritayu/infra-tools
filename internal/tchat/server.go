@@ -24,7 +24,7 @@ func send(msg []byte) {
 	}
 }
 
-func receiver(cl *Client) {
+func (cl *Client) receiver() {
 	buf := makeBuffer()
 	for {
 		n, err := cl.conn.Read(buf)
@@ -68,6 +68,6 @@ func ServerExecute() {
 		cl := createClient(conn, name)
 		clientList = append(clientList, cl)
 		send(makeMsg("joined!!", cl.name, RED))
-		go receiver(cl)
+		go cl.receiver()
 	}
 }
