@@ -59,9 +59,7 @@ func ServerExecute() {
 		}
 
 		//TODO createClientをシンプルにしたので、Executeの処理が多くなっている
-		//TODO stringとbyteが混在していて見にくい、送信するときだけbyte、それ以外は常にstringでやりたい
 		//TODO 関数から別関数をgoroutineしているため、非常にわかりにくい、テストしにくい
-		//TODO getNameはここで実行して、createClientの引数に渡したい
 		name, err := getName(conn)
 		if err != nil {
 			conn.Close()
