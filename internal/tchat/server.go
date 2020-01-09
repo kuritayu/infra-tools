@@ -15,26 +15,13 @@ const PORT = ":7777"
 
 var clientList []*Client
 
-func send(msg []byte) {
+func send(ch <-chan []byte) {
+	msg := <-ch
 	for _, cl := range clientList {
 		_, err := cl.conn.Write(msg)
 		if err != nil {
 			continue
 		}
-	}
-}
-
-func (cl *Client) receiver() {
-	buf := makeBuffer()
-	for {
-		n, err := cl.conn.Read(buf)
-		if err != nil {
-			go send(makeMsg("Quit.", cl.name, RED))
-			break
-		}
-		//TODO チャネル化
-		go send(makeMsg(string(buf[:n]), cl.name, cl.color))
-		buf = makeBuffer()
 	}
 }
 
@@ -67,7 +54,25 @@ func ServerExecute() {
 		}
 		cl := createClient(conn, name)
 		clientList = append(clientList, cl)
-		send(makeMsg("joined!!", cl.name, RED))
-		go cl.receiver()
+
+		ch := make(chan []byte)
+		go send(ch)
+		ch <- makeMsg("joined!!", cl.name, RED)
+
+		go func() {
+			buf := makeBuffer()
+			for {
+				n, err := cl.conn.Read(buf)
+				if err != nil {
+					go send(ch)
+					ch <- makeMsg("Quit.", cl.name, RED)
+					break
+				}
+				go send(ch)
+				ch <- makeMsg(string(buf[:n]), cl.name, cl.color)
+				buf = makeBuffer()
+			}
+
+		}()
 	}
 }
