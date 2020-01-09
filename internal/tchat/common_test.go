@@ -59,3 +59,8 @@ func TestMakeBuffer(t *testing.T) {
 	expected := make([]byte, 560)
 	assert.Equal(t, expected, actual)
 }
+
+func TestGetColor(t *testing.T) {
+	actual := getColor()
+	assert.Contains(t, [...]int{32, 33, 34, 35, 36}, actual)
+}
