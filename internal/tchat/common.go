@@ -52,7 +52,7 @@ func makeBuffer() []byte {
 }
 
 func getColor() int {
-	var colorList = [5]int{32, 33, 34, 35, 36}
+	var colorList = [5]int{GREEN, YELLOW, BLUE, PURPLE, CYAN}
 	rand.Seed(time.Now().UnixNano())
 	return colorList[rand.Intn(5)]
 }
