@@ -13,6 +13,7 @@ type Client struct {
 
 const PORT = ":7777"
 
+//TODO room構造体にする
 var clientList []*Client
 
 func send(ch <-chan []byte) {
@@ -47,6 +48,9 @@ func ServerExecute() {
 
 		//TODO createClientをシンプルにしたので、Executeの処理が多くなっている
 		//TODO 関数から別関数をgoroutineしているため、非常にわかりにくい、テストしにくい
+		//TODO 標準出力に状態を書きたい
+		//TODO ログハンドラもしたい
+		//TODO メッセージの記録
 		name, err := getName(conn)
 		if err != nil {
 			conn.Close()

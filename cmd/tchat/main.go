@@ -18,6 +18,7 @@ func main() {
 		},
 	}
 
+	//TODO port番号は指定できるようにしたい
 	app.Action = func(c *cli.Context) error {
 		if c.Bool("c") {
 			tchat.ClientExecute()
