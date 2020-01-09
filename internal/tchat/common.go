@@ -3,7 +3,6 @@ package tchat
 import (
 	"fmt"
 	"github.com/aybabtme/color/brush"
-	"io"
 	"math/rand"
 	"net"
 	"os"
@@ -58,30 +57,18 @@ func getColor() int {
 	return colorList[rand.Intn(5)]
 }
 
-func getName(conn net.Conn) string {
+func getName(conn net.Conn) (string, error) {
 	buf := makeBuffer()
 	n, err := conn.Read(buf)
 	if err != nil {
-		//TODO 失敗したらerrorを返したほうがよい
-		fmt.Println("Fail get name")
-		Close(conn)
-		os.Exit(1)
+		return "unknown", err
 	}
-	return string(buf[:n])
-}
-
-//TODO このメソッド不要の可能性高い
-func Close(c io.Closer) {
-	err := c.Close()
-	if err != nil {
-		_, _ = fmt.Fprintf(os.Stderr, err.Error())
-	}
+	return string(buf[:n]), nil
 }
 
 func ChkErr(err error, place string) {
 	if err != nil {
-		fmt.Printf("(%s)", place)
-		_, _ = fmt.Fprintf(os.Stderr, "%s", err.Error())
-		os.Exit(0)
+		_, _ = fmt.Fprintf(os.Stderr, "(%s) %s", place, err.Error())
+		os.Exit(1)
 	}
 }
