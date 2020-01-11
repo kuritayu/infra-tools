@@ -39,16 +39,18 @@ func ServerExecute() {
 	ChkErr(err, "tcpaddr")
 	li, err := net.ListenTCP("tcp", tcpAddr)
 	ChkErr(err, "tcpaddr")
+	fmt.Println("Listen start.")
 	for {
 		conn, err := li.Accept()
 		if err != nil {
 			fmt.Println("Fail to connect.")
 			continue
 		}
+		fmt.Println("Established connection. from: ", conn.RemoteAddr())
 
 		//TODO createClientをシンプルにしたので、Executeの処理が多くなっている
 		//TODO 関数から別関数をgoroutineしているため、非常にわかりにくい、テストしにくい
-		//TODO 標準出力に状態を書きたい
+		//TODO 標準出力に出力する情報とログに残すフォーマットはあわせたい
 		//TODO ログハンドラもしたい
 		//TODO メッセージの記録
 		name, err := getName(conn)
@@ -62,6 +64,7 @@ func ServerExecute() {
 		ch := make(chan []byte)
 		go send(ch)
 		ch <- makeMsg("joined!!", cl.name, RED)
+		fmt.Println("User joined. name: ", cl.name)
 
 		go func() {
 			buf := makeBuffer()
@@ -70,6 +73,7 @@ func ServerExecute() {
 				if err != nil {
 					go send(ch)
 					ch <- makeMsg("Quit.", cl.name, RED)
+					fmt.Println("User left. name: ", cl.name)
 					break
 				}
 				go send(ch)
