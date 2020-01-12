@@ -13,8 +13,15 @@ type Client struct {
 
 const PORT = ":7777"
 
-//TODO room構造体にする
 var clientList []*Client
+
+//TODO room構造体にする
+type room struct {
+	forward chan []byte
+	join    chan []byte
+	leave   chan []byte
+	clients map[*Client]bool
+}
 
 func send(ch <-chan []byte) {
 	msg := <-ch
