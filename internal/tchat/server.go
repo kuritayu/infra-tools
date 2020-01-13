@@ -11,6 +11,7 @@ type Client struct {
 	color int
 }
 
+//TODO ポートは可変(パラメータ化)
 const PORT = ":7777"
 
 func createClient(conn net.Conn, name string) *Client {
