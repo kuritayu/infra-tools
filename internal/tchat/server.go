@@ -15,14 +15,6 @@ const PORT = ":7777"
 
 var clientList []*Client
 
-//TODO room構造体を呼び出す
-type room struct {
-	forward chan []byte
-	join    chan []byte
-	leave   chan []byte
-	clients map[*Client]bool
-}
-
 func send(ch <-chan []byte) {
 	msg := <-ch
 	for _, cl := range clientList {
