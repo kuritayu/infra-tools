@@ -4,15 +4,15 @@ type room struct {
 	clients []*Client
 }
 
-func newRoom() *room {
+func NewRoom() *room {
 	return &room{}
 }
 
-func (r *room) add(c *Client) {
+func (r *room) Add(c *Client) {
 	r.clients = append(r.clients, c)
 }
 
-func (r *room) send(ch <-chan []byte) {
+func (r *room) Send(ch <-chan []byte) {
 	msg := <-ch
 	for _, cl := range r.clients {
 		_, err := cl.conn.Write(msg)

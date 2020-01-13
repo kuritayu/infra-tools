@@ -49,7 +49,7 @@ func TestMakeMsg(t *testing.T) {
 	now := getTime()
 	name := "TEST-USER"
 	msg := "Hello."
-	actual := makeMsg(msg, name, GREEN)
+	actual := MakeMsg(msg, name, GREEN)
 	expected := []byte(brush.DarkGreen(fmt.Sprintf("%s[%s] %s", now, name, msg)).String())
 	assert.Equal(t, expected, actual)
 }

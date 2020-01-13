@@ -42,7 +42,7 @@ func getTime() string {
 	return time.Now().Format("15:04")
 }
 
-func makeMsg(msg string, name string, color int) []byte {
+func MakeMsg(msg string, name string, color int) []byte {
 	template := fmt.Sprintf("%s[%s] %s", getTime(), name, msg)
 	return []byte(SprintColor(template, color))
 }
@@ -57,7 +57,7 @@ func getColor() int {
 	return colorList[rand.Intn(5)]
 }
 
-func getName(conn net.Conn) (string, error) {
+func GetName(conn net.Conn) (string, error) {
 	buf := makeBuffer()
 	n, err := conn.Read(buf)
 	if err != nil {
