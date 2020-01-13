@@ -53,14 +53,12 @@ func ServerExecute() {
 		}
 		fmt.Println("Established connection. from: ", conn.RemoteAddr())
 
-		//TODO createClientをシンプルにしたので、Executeの処理が多くなっている
-		//TODO 関数から別関数をgoroutineしているため、非常にわかりにくい、テストしにくい
 		//TODO 標準出力に出力する情報とログに残すフォーマットはあわせたい
 		//TODO ログハンドラもしたい
 		//TODO メッセージの記録
 		name, err := getName(conn)
 		if err != nil {
-			conn.Close()
+			_ = conn.Close()
 			ChkErr(err, "getName")
 		}
 		cl := createClient(conn, name)
