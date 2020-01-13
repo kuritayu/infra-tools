@@ -13,18 +13,6 @@ type Client struct {
 
 const PORT = ":7777"
 
-var clientList []*Client
-
-func send(ch <-chan []byte) {
-	msg := <-ch
-	for _, cl := range clientList {
-		_, err := cl.conn.Write(msg)
-		if err != nil {
-			continue
-		}
-	}
-}
-
 func createClient(conn net.Conn, name string) *Client {
 	return &Client{
 		name:  name,
@@ -39,6 +27,7 @@ func ServerExecute() {
 	li, err := net.ListenTCP("tcp", tcpAddr)
 	ChkErr(err, "tcpaddr")
 	fmt.Println("Listen start.")
+	room := newRoom()
 	for {
 		conn, err := li.Accept()
 		if err != nil {
@@ -58,10 +47,10 @@ func ServerExecute() {
 			ChkErr(err, "getName")
 		}
 		cl := createClient(conn, name)
-		clientList = append(clientList, cl)
+		room.add(cl)
 
 		ch := make(chan []byte)
-		go send(ch)
+		go room.send(ch)
 		ch <- makeMsg("joined!!", cl.name, RED)
 		fmt.Println("User joined. name: ", cl.name)
 
@@ -70,12 +59,12 @@ func ServerExecute() {
 			for {
 				n, err := cl.conn.Read(buf)
 				if err != nil {
-					go send(ch)
+					go room.send(ch)
 					ch <- makeMsg("Quit.", cl.name, RED)
 					fmt.Println("User left. name: ", cl.name)
 					break
 				}
-				go send(ch)
+				go room.send(ch)
 				ch <- makeMsg(string(buf[:n]), cl.name, cl.color)
 				buf = makeBuffer()
 			}
