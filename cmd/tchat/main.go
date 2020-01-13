@@ -10,7 +10,11 @@ import (
 	"time"
 )
 
-const PORT = ":7777"
+var (
+	SERVER = "127.0.0.1"
+	PORT   = "7777"
+	URI    = fmt.Sprintf("%s:%s", SERVER, PORT)
+)
 
 func main() {
 	app := cli.NewApp()
@@ -40,7 +44,7 @@ func main() {
 }
 
 func serverExecute() {
-	tcpAddr, err := net.ResolveTCPAddr("tcp4", PORT)
+	tcpAddr, err := net.ResolveTCPAddr("tcp4", URI)
 	tchat.ChkErr(err, "tcpaddr")
 	li, err := net.ListenTCP("tcp", tcpAddr)
 	tchat.ChkErr(err, "tcpaddr")
@@ -74,18 +78,16 @@ func serverExecute() {
 }
 
 func clientExecute() {
-	fmt.Print("Please input your name: ")
-	reader := bufio.NewReader(os.Stdin)
-	name, _, err := reader.ReadLine()
-
-	host := "127.0.0.1:7777"
-	tcpAddr, err := net.ResolveTCPAddr("tcp4", host)
+	tcpAddr, err := net.ResolveTCPAddr("tcp4", URI)
 	tchat.ChkErr(err, "tcpAddr")
 
 	conn, err := net.DialTCP("tcp", nil, tcpAddr)
 	tchat.ChkErr(err, "DialTCP")
 	defer tchat.Teardown(conn)
 
+	fmt.Print("Please input your name: ")
+	reader := bufio.NewReader(os.Stdin)
+	name, _, err := reader.ReadLine()
 	_, err = conn.Write(name)
 	tchat.ChkErr(err, "Write name")
 
