@@ -21,6 +21,23 @@ func createClient(conn net.Conn, name string) *Client {
 	}
 }
 
+func (c *Client) read(r *room) {
+	ch := make(chan []byte)
+	buf := makeBuffer()
+	for {
+		n, err := c.conn.Read(buf)
+		if err != nil {
+			go r.send(ch)
+			ch <- makeMsg("Quit.", c.name, RED)
+			fmt.Println("User left. name: ", c.name)
+			break
+		}
+		go r.send(ch)
+		ch <- makeMsg(string(buf[:n]), c.name, c.color)
+		buf = makeBuffer()
+	}
+}
+
 func ServerExecute() {
 	tcpAddr, err := net.ResolveTCPAddr("tcp4", PORT)
 	ChkErr(err, "tcpaddr")
@@ -53,22 +70,6 @@ func ServerExecute() {
 		go room.send(ch)
 		ch <- makeMsg("joined!!", cl.name, RED)
 		fmt.Println("User joined. name: ", cl.name)
-
-		go func() {
-			buf := makeBuffer()
-			for {
-				n, err := cl.conn.Read(buf)
-				if err != nil {
-					go room.send(ch)
-					ch <- makeMsg("Quit.", cl.name, RED)
-					fmt.Println("User left. name: ", cl.name)
-					break
-				}
-				go room.send(ch)
-				ch <- makeMsg(string(buf[:n]), cl.name, cl.color)
-				buf = makeBuffer()
-			}
-
-		}()
+		go cl.read(room)
 	}
 }
