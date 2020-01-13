@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
+	"github.com/kuritayu/infra-tools/internal/lstar"
+	"github.com/kuritayu/infra-tools/pkg"
 	"github.com/urfave/cli"
-	"infra-tools/internal/lstar"
-	"infra-tools/pkg"
 	"os"
 )
 

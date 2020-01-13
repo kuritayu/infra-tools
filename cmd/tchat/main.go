@@ -1,8 +1,8 @@
 package main
 
 import (
+	"github.com/kuritayu/infra-tools/internal/tchat"
 	"github.com/urfave/cli"
-	"infra-tools/internal/tchat"
 	"os"
 )
 
