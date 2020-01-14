@@ -85,16 +85,18 @@ func clientExecute() {
 	tchat.ChkErr(err, "DialTCP")
 	defer conn.Close()
 
+	connection := tchat.NewConnection(conn)
+
 	fmt.Print("Please input your name: ")
 	reader := bufio.NewReader(os.Stdin)
 	name, _, err := reader.ReadLine()
-	_, err = conn.Write(name)
+	_, err = connection.Conn.Write(name)
 	tchat.ChkErr(err, "Write name")
 
-	go tchat.Reflector(conn)
-	go tchat.Sender(conn)
+	go connection.Reflector()
+	go connection.Sender()
 
-	for tchat.Running {
+	for connection.Status {
 		time.Sleep(1 * 1e9)
 	}
 }

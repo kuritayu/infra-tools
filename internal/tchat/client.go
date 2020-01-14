@@ -7,26 +7,35 @@ import (
 	"os"
 )
 
-//TODO 構造体にしたほうがよい
-var Running = true
+type Connection struct {
+	Conn   net.Conn
+	Status bool
+}
 
-func Sender(conn net.Conn) {
+func NewConnection(conn net.Conn) *Connection {
+	return &Connection{
+		Conn:   conn,
+		Status: true,
+	}
+}
+
+func (c *Connection) Sender() {
 	reader := bufio.NewReader(os.Stdin)
 	for {
 		input, _, _ := reader.ReadLine()
 		if string(input) == "\\q" {
-			Running = false
+			c.Status = false
 			break
 		}
-		_, err := conn.Write(input)
+		_, err := c.Conn.Write(input)
 		ChkErr(err, "sender write")
 	}
 }
 
-func Reflector(conn net.Conn) {
+func (c *Connection) Reflector() {
 	buf := makeBuffer()
-	for Running == true {
-		n, err := conn.Read(buf)
+	for c.Status {
+		n, err := c.Conn.Read(buf)
 		ChkErr(err, "Receiver read")
 		fmt.Println(string(buf[:n]))
 		buf = makeBuffer()
