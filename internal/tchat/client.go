@@ -7,6 +7,7 @@ import (
 	"os"
 )
 
+//TODO 構造体にしたほうがよい
 var Running = true
 
 func Sender(conn net.Conn) {
