@@ -83,7 +83,7 @@ func clientExecute() {
 
 	conn, err := net.DialTCP("tcp", nil, tcpAddr)
 	tchat.ChkErr(err, "DialTCP")
-	defer tchat.Teardown(conn)
+	defer conn.Close()
 
 	fmt.Print("Please input your name: ")
 	reader := bufio.NewReader(os.Stdin)

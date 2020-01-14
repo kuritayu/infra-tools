@@ -3,7 +3,6 @@ package tchat
 import (
 	"bufio"
 	"fmt"
-	"io"
 	"net"
 	"os"
 )
@@ -30,12 +29,5 @@ func Reflector(conn net.Conn) {
 		ChkErr(err, "Receiver read")
 		fmt.Println(string(buf[:n]))
 		buf = makeBuffer()
-	}
-}
-
-func Teardown(c io.Closer) {
-	err := c.Close()
-	if err != nil {
-		_, _ = fmt.Fprintf(os.Stderr, err.Error())
 	}
 }
