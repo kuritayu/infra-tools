@@ -11,6 +11,7 @@ type Client struct {
 	color int
 }
 
+// CreateClientはクライアント情報を設定する。
 func CreateClient(conn net.Conn, name string) *Client {
 	return &Client{
 		Name:  name,
@@ -19,6 +20,8 @@ func CreateClient(conn net.Conn, name string) *Client {
 	}
 }
 
+//TODO Readがデータの読み込み、ルームメンバに対しての配信を担当しているため、わかりにくい。
+// Readがroomを引数として必要としている点からもわかる。ReadはあくまでもReadし、文字列を返すことに特化させる。
 func (c *Client) Read(r *room) {
 	ch := make(chan []byte)
 	buf := makeBuffer()

@@ -9,7 +9,7 @@ type Connection struct {
 	Status bool
 }
 
-// NewConnectionはコネクション状態を保持する。
+// NewConnectionはコネクション状態を設定する。
 func NewConnection(conn net.Conn) *Connection {
 	return &Connection{
 		Conn:   conn,
