@@ -10,6 +10,10 @@ import (
 	"time"
 )
 
+//TODO 標準出力に出力する情報とログに残すフォーマットはあわせたい
+//TODO ログハンドラもしたい
+//TODO メッセージの記録
+
 var (
 	SERVER = "127.0.0.1"
 	PORT   = "7777"
@@ -46,13 +50,20 @@ func main() {
 }
 
 func serverExecute() {
+	// URIの解決
 	tcpAddr, err := net.ResolveTCPAddr("tcp4", URI)
 	tchat.ChkErr(err, "tcpaddr")
+
+	// リッスン開始
 	li, err := net.ListenTCP("tcp", tcpAddr)
 	tchat.ChkErr(err, "tcpaddr")
 	fmt.Println("Listen start.")
+
+	// ルーム作成
 	room := tchat.NewRoom()
+
 	for {
+		// コネクション確立
 		conn, err := li.Accept()
 		if err != nil {
 			fmt.Println("Fail to connect.")
@@ -60,21 +71,27 @@ func serverExecute() {
 		}
 		fmt.Println("Established connection. from: ", conn.RemoteAddr())
 
-		//TODO 標準出力に出力する情報とログに残すフォーマットはあわせたい
-		//TODO ログハンドラもしたい
-		//TODO メッセージの記録
+		// 確立後の最初のデータからクライアントの名前を取得する。
+		//TODO GetNameはmainの中でメソッドにすればよい
 		name, err := tchat.GetName(conn)
 		if err != nil {
 			_ = conn.Close()
 			tchat.ChkErr(err, "getName")
 		}
+
+		// クライアント情報を生成する。
 		cl := tchat.CreateClient(conn, name)
+
+		// クライアント情報をルームに格納する。
 		room.Add(cl)
 
+		// クライアントが参加した旨をルームの参加者全員に配信する。
 		ch := make(chan []byte)
 		go room.Send(ch)
 		ch <- tchat.MakeMsg("joined!!", cl.Name, tchat.RED)
 		fmt.Println("User joined. name: ", cl.Name)
+
+		// クライアントからのデータ受信を待つ。
 		go cl.Read(room)
 	}
 }
