@@ -78,24 +78,36 @@ func serverExecute() {
 }
 
 func clientExecute() {
+	// URIの解決
 	tcpAddr, err := net.ResolveTCPAddr("tcp4", URI)
 	tchat.ChkErr(err, "tcpAddr")
 
+	// chatサーバへの接続
 	conn, err := net.DialTCP("tcp", nil, tcpAddr)
 	tchat.ChkErr(err, "DialTCP")
 	defer conn.Close()
 
+	// 接続状態を構造体にセット
 	connection := tchat.NewConnection(conn)
 
+	// クライアントの名前を標準入力から取得
 	fmt.Print("Please input your name: ")
 	reader := bufio.NewReader(os.Stdin)
 	name, _, err := reader.ReadLine()
+
+	// chatサーバへのデータ送信(クライアントの名前)
+	//TODO ここをSender使えないか？
 	_, err = connection.Conn.Write(name)
 	tchat.ChkErr(err, "Write name")
 
+	// chatサーバからメッセージを受信すると、標準出力に反映するためのゴルーチン
 	go connection.Reflector()
+
+	// chatサーバにメッセージを送信するためにゴルーチン
 	go connection.Sender()
 
+	// メッセージ送信、受信を行うためのWait
+	//TODO これを起点としたforループにできないか？
 	for connection.Status {
 		time.Sleep(1 * 1e9)
 	}

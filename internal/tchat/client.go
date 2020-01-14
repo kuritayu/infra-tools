@@ -12,6 +12,7 @@ type Connection struct {
 	Status bool
 }
 
+// NewConnectionはコネクション状態を保持する。
 func NewConnection(conn net.Conn) *Connection {
 	return &Connection{
 		Conn:   conn,
@@ -19,6 +20,8 @@ func NewConnection(conn net.Conn) *Connection {
 	}
 }
 
+// Senderはchatサーバに対してメッセージを送信する。
+//TODO 今の実装では、標準入力からの読み込み、メッセージ送信(Connへの書き込み)の2つを処理している(関心を分離)
 func (c *Connection) Sender() {
 	reader := bufio.NewReader(os.Stdin)
 	for {
@@ -32,6 +35,7 @@ func (c *Connection) Sender() {
 	}
 }
 
+// Reflectorはchatサーバから受信したデータを標準出力に書き込む。
 func (c *Connection) Reflector() {
 	buf := makeBuffer()
 	for c.Status {
