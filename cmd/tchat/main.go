@@ -16,6 +16,8 @@ var (
 	URI    = fmt.Sprintf("%s:%s", SERVER, PORT)
 )
 
+const ESCAPESTRING = "\\q"
+
 func main() {
 	app := cli.NewApp()
 	app.Name = "tchat"
@@ -97,18 +99,35 @@ func clientExecute() {
 
 	// chatサーバへのデータ送信(クライアントの名前)
 	//TODO ここをSender使えないか？
-	_, err = connection.Conn.Write(name)
+	err = connection.SendToServer(name)
 	tchat.ChkErr(err, "Write name")
 
-	// chatサーバからメッセージを受信すると、標準出力に反映するためのゴルーチン
-	go connection.Reflector()
-
-	// chatサーバにメッセージを送信するためにゴルーチン
-	go connection.Sender()
-
-	// メッセージ送信、受信を行うためのWait
-	//TODO これを起点としたforループにできないか？
 	for connection.Status {
+		// chatサーバからメッセージを受信すると、標準出力に反映するためのゴルーチン
+		go connection.ReflectFromServer()
+
+		// chatサーバにメッセージを送信するためにゴルーチン
+		go func() {
+			reader := bufio.NewReader(os.Stdin)
+			for {
+
+				// 標準入力からメッセージを取得
+				input, _, _ := reader.ReadLine()
+				if string(input) == ESCAPESTRING {
+					connection.Status = false
+					break
+				}
+
+				// chatサーバへのデータ送信
+				err := connection.SendToServer(input)
+				if err != nil {
+					connection.Status = false
+					break
+				}
+			}
+		}()
+
+		// メッセージ送信、受信用の待ち処理
 		time.Sleep(1 * 1e9)
 	}
 }
