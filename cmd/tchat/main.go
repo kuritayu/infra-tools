@@ -98,13 +98,21 @@ func clientExecute() {
 	name, _, err := reader.ReadLine()
 
 	// chatサーバへのデータ送信(クライアントの名前)
-	//TODO ここをSender使えないか？
 	err = connection.SendToServer(name)
 	tchat.ChkErr(err, "Write name")
 
 	for connection.Status {
 		// chatサーバからメッセージを受信すると、標準出力に反映するためのゴルーチン
-		go connection.ReflectFromServer()
+		go func() {
+			// chatサーバからデータを受信
+			msg, err := connection.ReceiveFromServer()
+			if err != nil {
+				connection.Status = false
+			}
+
+			// 標準出力に書き込み
+			fmt.Println(msg)
+		}()
 
 		// chatサーバにメッセージを送信するためにゴルーチン
 		go func() {
@@ -128,6 +136,6 @@ func clientExecute() {
 		}()
 
 		// メッセージ送信、受信用の待ち処理
-		time.Sleep(1 * 1e9)
+		time.Sleep(time.Microsecond)
 	}
 }
