@@ -199,7 +199,7 @@ func clientExecute() {
 		for {
 
 			// 標準入力からメッセージを取得
-			input, _, _ := reader.ReadLine() // ここがクローズされていないからと思われる
+			input, _, _ := reader.ReadLine()
 			if string(input) == ESCAPESTRING {
 				connection.Status = false
 				break
