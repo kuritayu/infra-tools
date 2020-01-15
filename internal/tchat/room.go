@@ -15,7 +15,7 @@ func (r *room) Add(c *Client) {
 func (r *room) Send(ch <-chan []byte) {
 	msg := <-ch
 	for _, cl := range r.clients {
-		_, err := cl.conn.Write(msg)
+		_, err := cl.Conn.Write(msg)
 		if err != nil {
 			continue
 		}

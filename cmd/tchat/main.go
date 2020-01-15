@@ -91,7 +91,21 @@ func serverExecute() {
 		fmt.Println("User joined. name: ", cl.Name)
 
 		// クライアントからのデータ受信を待つ。
-		go cl.Read(room)
+		go func() {
+			ch := make(chan []byte)
+			for {
+				go room.Send(ch)
+				msg, err := tchat.Read(cl.Conn)
+				if err != nil {
+					go room.Send(ch)
+					ch <- tchat.MakeMsg("Quit.", cl.Name, tchat.RED)
+					fmt.Println("User left. name: ", cl.Name)
+					break
+				}
+				ch <- tchat.MakeMsg(msg, cl.Name, cl.Color)
+			}
+		}()
+
 	}
 }
 
@@ -121,7 +135,7 @@ func clientExecute() {
 		// chatサーバからメッセージを受信すると、標準出力に反映するためのゴルーチン
 		go func() {
 			// chatサーバからデータを受信
-			msg, err := connection.ReceiveFromServer()
+			msg, err := tchat.Read(connection.Conn)
 			if err != nil {
 				connection.Status = false
 			}

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/aybabtme/color/brush"
 	"math/rand"
+	"net"
 	"time"
 )
 
@@ -53,4 +54,13 @@ func getColor() int {
 	var colorList = [5]int{GREEN, YELLOW, BLUE, PURPLE, CYAN}
 	rand.Seed(time.Now().UnixNano())
 	return colorList[rand.Intn(5)]
+}
+
+func Read(conn net.Conn) (string, error) {
+	buf := MakeBuffer()
+	n, err := conn.Read(buf)
+	if err != nil {
+		return "", err
+	}
+	return string(buf[:n]), nil
 }

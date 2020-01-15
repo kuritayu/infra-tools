@@ -1,6 +1,7 @@
 package tchat
 
 import (
+	"errors"
 	"fmt"
 	"github.com/aybabtme/color/brush"
 	"github.com/stretchr/testify/assert"
@@ -63,4 +64,14 @@ func TestMakeBuffer(t *testing.T) {
 func TestGetColor(t *testing.T) {
 	actual := getColor()
 	assert.Contains(t, [...]int{32, 33, 34, 35, 36}, actual)
+}
+
+func TestRead(t *testing.T) {
+	connection := NewConnection(new(MockConn))
+	actual, actualErr := Read(connection.Conn)
+	expectedErr := errors.New("dummy")
+
+	assert.Equal(t, "", actual)
+	assert.Equal(t, expectedErr, actualErr)
+
 }
