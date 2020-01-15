@@ -22,14 +22,3 @@ func (c *Connection) SendToServer(b []byte) error {
 	_, err := c.Conn.Write(b)
 	return err
 }
-
-// Reflectorはchatサーバから受信したデータをstring型に変換する。
-//func (c *Connection) ReceiveFromServer() (string, error) {
-//	buf := MakeBuffer()
-//	n, err := c.Conn.Read(buf)
-//	if err != nil {
-//		return "", err
-//	}
-//
-//	return string(buf[:n]), nil
-//}
