@@ -1,6 +1,5 @@
 package tchat
 
-//TODO ルームに入っているクライアントの一覧を表示する
 type room struct {
 	Name    string
 	clients map[*Client]bool

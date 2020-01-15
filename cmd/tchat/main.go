@@ -63,9 +63,9 @@ func serverExecute() {
 	fmt.Println("Listen start.")
 
 	// ルーム作成
-	//TODO ルーム名はserverExecute()実行時の引数から取得する
-	//現時点ではPUBLIC固定
-	//TODO 既存のルームがあれば作成しないようにする
+	// 現時点ではサーバ起動時に"PUBLIC"ルームを常に作成している。
+	// 最終形は、クライアントからルーム名を受け取り、該当のルームがなければ作成、
+	// あれば既存のルームに参加するようにする
 	room := tchat.NewRoom(ROOMNAME)
 
 	for {
@@ -83,6 +83,8 @@ func serverExecute() {
 			_ = conn.Close()
 			chkErr(err, "getName")
 		}
+
+		//TODO ここでルーム名をクライアントから受け取る。
 
 		// クライアント情報を生成する。
 		cl := tchat.NewClient(conn, name)
@@ -109,6 +111,8 @@ func serverExecute() {
 					room.Delete(cl)
 					break
 				}
+
+				//TODO 特殊な文字(ex. %L)を受信すると、ルームに在席中のメンバ一覧を表示する。
 				ch <- tchat.MakeMsg(msg, cl.Name, cl.Color)
 			}
 		}()
