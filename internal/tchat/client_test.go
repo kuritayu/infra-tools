@@ -17,13 +17,3 @@ func TestConnection_SendToServer(t *testing.T) {
 	expected := errors.New("dummy")
 	assert.Equal(t, expected, actual)
 }
-
-func TestConnection_ReceiveFromServer(t *testing.T) {
-	connection := NewConnection(new(MockConn))
-	actual, actualErr := connection.ReceiveFromServer()
-	expectedErr := errors.New("dummy")
-
-	assert.Equal(t, "", actual)
-	assert.Equal(t, expectedErr, actualErr)
-
-}

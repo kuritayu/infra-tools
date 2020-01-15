@@ -95,7 +95,7 @@ func serverExecute() {
 			ch := make(chan []byte)
 			for {
 				go room.Send(ch)
-				msg, err := cl.Read()
+				msg, err := tchat.Read(cl.Conn)
 				if err != nil {
 					go room.Send(ch)
 					ch <- tchat.MakeMsg("Quit.", cl.Name, tchat.RED)
@@ -135,7 +135,7 @@ func clientExecute() {
 		// chatサーバからメッセージを受信すると、標準出力に反映するためのゴルーチン
 		go func() {
 			// chatサーバからデータを受信
-			msg, err := connection.ReceiveFromServer()
+			msg, err := tchat.Read(connection.Conn)
 			if err != nil {
 				connection.Status = false
 			}
