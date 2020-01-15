@@ -20,7 +20,10 @@ var (
 	URI    = fmt.Sprintf("%s:%s", SERVER, PORT)
 )
 
-const ESCAPESTRING = "\\q"
+const (
+	ESCAPESTRING = "\\q"
+	ROOMNAME     = "PUBLIC"
+)
 
 func main() {
 	app := cli.NewApp()
@@ -60,7 +63,10 @@ func serverExecute() {
 	fmt.Println("Listen start.")
 
 	// ルーム作成
-	room := tchat.NewRoom()
+	//TODO ルーム名はserverExecute()実行時の引数から取得する
+	//現時点ではPUBLIC固定
+	//TODO 既存のルームがあれば作成しないようにする
+	room := tchat.NewRoom(ROOMNAME)
 
 	for {
 		// コネクション確立
@@ -146,6 +152,7 @@ func clientExecute() {
 		}()
 
 		// chatサーバにメッセージを送信するためにゴルーチン
+		//TODO 放置しておくとソケットを使い切ってしまい、落ちる(最重要)
 		go func() {
 			reader := bufio.NewReader(os.Stdin)
 			for {

@@ -1,14 +1,15 @@
 package tchat
 
-//TODO ルーム名を設定する
 //TODO ルームに入っているクライアントの一覧を表示する
 type room struct {
+	Name    string
 	clients map[*Client]bool
 }
 
 // NewRoomはルームを設定する。
-func NewRoom() *room {
+func NewRoom(name string) *room {
 	return &room{
+		Name:    name,
 		clients: make(map[*Client]bool),
 	}
 }

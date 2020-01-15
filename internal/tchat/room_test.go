@@ -6,14 +6,17 @@ import (
 )
 
 func TestNewRoom(t *testing.T) {
-	actual := NewRoom()
-	expected := &room{clients: make(map[*Client]bool)}
+	actual := NewRoom("PUBLIC")
+	expected := &room{
+		Name:    "PUBLIC",
+		clients: make(map[*Client]bool),
+	}
 	assert.Equal(t, expected, actual)
 }
 
 func TestRoom_Add(t *testing.T) {
 	client := NewClient(new(MockConn), "TEST-USER")
-	room := NewRoom()
+	room := NewRoom("PUBLIC")
 	room.Add(client)
 	actual := len(room.clients)
 	expected := 1
@@ -22,7 +25,7 @@ func TestRoom_Add(t *testing.T) {
 
 func TestRoom_Send(t *testing.T) {
 	client := NewClient(new(MockConn), "TEST-USER")
-	room := NewRoom()
+	room := NewRoom("PUBLIC")
 	room.Add(client)
 	ch := make(chan []byte)
 	go room.Send(ch)
@@ -31,7 +34,7 @@ func TestRoom_Send(t *testing.T) {
 
 func TestRoom_Delete(t *testing.T) {
 	client := NewClient(new(MockConn), "TEST-USER")
-	room := NewRoom()
+	room := NewRoom("PUBLIC")
 	room.Add(client)
 	room.Delete(client)
 	actual := len(room.clients)
