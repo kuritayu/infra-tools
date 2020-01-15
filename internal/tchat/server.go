@@ -24,7 +24,7 @@ func CreateClient(conn net.Conn, name string) *Client {
 // Readがroomを引数として必要としている点からもわかる。ReadはあくまでもReadし、文字列を返すことに特化させる。
 func (c *Client) Read(r *room) {
 	ch := make(chan []byte)
-	buf := makeBuffer()
+	buf := MakeBuffer()
 	for {
 		n, err := c.conn.Read(buf)
 		if err != nil {
@@ -35,6 +35,6 @@ func (c *Client) Read(r *room) {
 		}
 		go r.Send(ch)
 		ch <- MakeMsg(string(buf[:n]), c.Name, c.color)
-		buf = makeBuffer()
+		buf = MakeBuffer()
 	}
 }

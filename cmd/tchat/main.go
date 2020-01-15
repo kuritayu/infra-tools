@@ -52,11 +52,11 @@ func main() {
 func serverExecute() {
 	// URIの解決
 	tcpAddr, err := net.ResolveTCPAddr("tcp4", URI)
-	tchat.ChkErr(err, "tcpaddr")
+	chkErr(err, "tcpaddr")
 
 	// リッスン開始
 	li, err := net.ListenTCP("tcp", tcpAddr)
-	tchat.ChkErr(err, "tcpaddr")
+	chkErr(err, "tcpaddr")
 	fmt.Println("Listen start.")
 
 	// ルーム作成
@@ -72,11 +72,10 @@ func serverExecute() {
 		fmt.Println("Established connection. from: ", conn.RemoteAddr())
 
 		// 確立後の最初のデータからクライアントの名前を取得する。
-		//TODO GetNameはmainの中でメソッドにすればよい
-		name, err := tchat.GetName(conn)
+		name, err := getName(conn)
 		if err != nil {
 			_ = conn.Close()
-			tchat.ChkErr(err, "getName")
+			chkErr(err, "getName")
 		}
 
 		// クライアント情報を生成する。
@@ -99,11 +98,11 @@ func serverExecute() {
 func clientExecute() {
 	// URIの解決
 	tcpAddr, err := net.ResolveTCPAddr("tcp4", URI)
-	tchat.ChkErr(err, "tcpAddr")
+	chkErr(err, "tcpAddr")
 
 	// chatサーバへの接続
 	conn, err := net.DialTCP("tcp", nil, tcpAddr)
-	tchat.ChkErr(err, "DialTCP")
+	chkErr(err, "DialTCP")
 	defer conn.Close()
 
 	// 接続状態を構造体にセット
@@ -116,7 +115,7 @@ func clientExecute() {
 
 	// chatサーバへのデータ送信(クライアントの名前)
 	err = connection.SendToServer(name)
-	tchat.ChkErr(err, "Write name")
+	chkErr(err, "Write name")
 
 	for connection.Status {
 		// chatサーバからメッセージを受信すると、標準出力に反映するためのゴルーチン
@@ -154,5 +153,21 @@ func clientExecute() {
 
 		// メッセージ送信、受信用の待ち処理
 		time.Sleep(time.Microsecond)
+	}
+}
+
+func getName(conn net.Conn) (string, error) {
+	buf := tchat.MakeBuffer()
+	n, err := conn.Read(buf)
+	if err != nil {
+		return "unknown", err
+	}
+	return string(buf[:n]), nil
+}
+
+func chkErr(err error, place string) {
+	if err != nil {
+		_, _ = fmt.Fprintf(os.Stderr, "(%s) %s", place, err.Error())
+		os.Exit(1)
 	}
 }

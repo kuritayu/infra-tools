@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"github.com/aybabtme/color/brush"
 	"math/rand"
-	"net"
-	"os"
 	"time"
 )
 
@@ -47,7 +45,7 @@ func MakeMsg(msg string, name string, color int) []byte {
 	return []byte(SprintColor(template, color))
 }
 
-func makeBuffer() []byte {
+func MakeBuffer() []byte {
 	return make([]byte, BUFFERLENGTH)
 }
 
@@ -55,20 +53,4 @@ func getColor() int {
 	var colorList = [5]int{GREEN, YELLOW, BLUE, PURPLE, CYAN}
 	rand.Seed(time.Now().UnixNano())
 	return colorList[rand.Intn(5)]
-}
-
-func GetName(conn net.Conn) (string, error) {
-	buf := makeBuffer()
-	n, err := conn.Read(buf)
-	if err != nil {
-		return "unknown", err
-	}
-	return string(buf[:n]), nil
-}
-
-func ChkErr(err error, place string) {
-	if err != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "(%s) %s", place, err.Error())
-		os.Exit(1)
-	}
 }

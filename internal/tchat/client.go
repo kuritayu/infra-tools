@@ -25,7 +25,7 @@ func (c *Connection) SendToServer(b []byte) error {
 
 // Reflectorはchatサーバから受信したデータをstring型に変換する。
 func (c *Connection) ReceiveFromServer() (string, error) {
-	buf := makeBuffer()
+	buf := MakeBuffer()
 	n, err := c.Conn.Read(buf)
 	if err != nil {
 		return "", err
