@@ -11,7 +11,7 @@ func TestNewRoom(t *testing.T) {
 }
 
 func TestRoom_Add(t *testing.T) {
-	client := CreateClient(new(MockConn), "TEST-USER")
+	client := NewClient(new(MockConn), "TEST-USER")
 	room := NewRoom()
 	room.Add(client)
 	actual := len(room.clients)
@@ -20,7 +20,7 @@ func TestRoom_Add(t *testing.T) {
 }
 
 func TestRoom_Send(t *testing.T) {
-	client := CreateClient(new(MockConn), "TEST-USER")
+	client := NewClient(new(MockConn), "TEST-USER")
 	room := NewRoom()
 	room.Add(client)
 	ch := make(chan []byte)

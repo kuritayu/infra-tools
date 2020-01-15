@@ -6,7 +6,7 @@ import (
 )
 
 func TestCreateClient(t *testing.T) {
-	actual := CreateClient(new(MockConn), "test")
+	actual := NewClient(new(MockConn), "test")
 	expected := "test"
 	assert.Equal(t, expected, actual.Name)
 

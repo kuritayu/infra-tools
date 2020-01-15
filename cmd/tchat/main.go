@@ -79,7 +79,7 @@ func serverExecute() {
 		}
 
 		// クライアント情報を生成する。
-		cl := tchat.CreateClient(conn, name)
+		cl := tchat.NewClient(conn, name)
 
 		// クライアント情報をルームに格納する。
 		room.Add(cl)

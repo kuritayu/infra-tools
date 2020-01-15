@@ -11,7 +11,7 @@ type Client struct {
 }
 
 // CreateClientはクライアント情報を設定する。
-func CreateClient(conn net.Conn, name string) *Client {
+func NewClient(conn net.Conn, name string) *Client {
 	return &Client{
 		Name:  name,
 		Conn:  conn,
