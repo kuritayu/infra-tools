@@ -10,8 +10,6 @@ import (
 	"time"
 )
 
-//TODO ログ出力が随所にでてみにくい
-
 var (
 	SERVER = "127.0.0.1"
 	PORT   = "7777"
