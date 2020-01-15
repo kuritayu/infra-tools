@@ -3,16 +3,17 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"github.com/comail/colog"
 	"github.com/kuritayu/infra-tools/internal/tchat"
 	"github.com/urfave/cli"
+	"log"
 	"net"
 	"os"
 	"time"
 )
 
-//TODO 標準出力に出力する情報とログに残すフォーマットはあわせたい
-//TODO ログハンドラもしたい
-//TODO メッセージの記録
+//TODO ログ定義がサーバとクライアントで重複
+//TODO ログ出力が随所にでてみにくい
 
 var (
 	SERVER = "127.0.0.1"
@@ -53,20 +54,34 @@ func main() {
 }
 
 func serverExecute() {
+	// ログ定義
+	colog.SetDefaultLevel(colog.LDebug)
+	colog.SetMinLevel(colog.LTrace)
+	colog.SetFormatter(&colog.StdFormatter{
+		Flag:        log.Ldate | log.Ltime | log.Lshortfile,
+		HeaderPlain: nil,
+		HeaderColor: nil,
+		Colors:      true,
+		NoColors:    false,
+	})
+	colog.Register()
+
 	// URIの解決
 	tcpAddr, err := net.ResolveTCPAddr("tcp4", URI)
-	chkErr(err, "tcpaddr")
+	chkErr(err)
+	log.Printf("trace: URIの解決が完了しました。")
 
 	// リッスン開始
 	li, err := net.ListenTCP("tcp", tcpAddr)
-	chkErr(err, "tcpaddr")
-	fmt.Println("Listen start.")
+	chkErr(err)
+	log.Printf("info: リッスンを開始しました。")
 
 	// ルーム作成
 	// 現時点ではサーバ起動時に"PUBLIC"ルームを常に作成している。
 	// 最終形は、クライアントからルーム名を受け取り、該当のルームがなければ作成、
 	// あれば既存のルームに参加するようにする
 	room := tchat.NewRoom(ROOMNAME)
+	log.Printf("info: ルーム[%s]を作成しました。", ROOMNAME)
 
 	for {
 		// コネクション確立
@@ -75,28 +90,31 @@ func serverExecute() {
 			fmt.Println("Fail to connect.")
 			continue
 		}
-		fmt.Println("Established connection. from: ", conn.RemoteAddr())
+		log.Printf("info: コネクションが確立されました。接続元: %s", conn.RemoteAddr())
 
 		// 確立後の最初のデータからクライアントの名前を取得する。
 		name, err := getName(conn)
 		if err != nil {
 			_ = conn.Close()
-			chkErr(err, "getName")
 		}
+		log.Printf("trace: クライアントの名前を取得しました。名前: %s", name)
 
 		//TODO ここでルーム名をクライアントから受け取る。
 
 		// クライアント情報を生成する。
 		cl := tchat.NewClient(conn, name)
+		log.Printf("trace: クライアント情報を生成しました。名前: %s", cl.Name)
 
 		// クライアント情報をルームに格納する。
 		room.Add(cl)
+		log.Printf("trace: クライアント[%s]をルーム[%s]に追加しました。", cl.Name, room.Name)
 
 		// クライアントが参加した旨をルームの参加者全員に配信する。
 		ch := make(chan []byte)
 		go room.Send(ch)
 		ch <- tchat.MakeMsg("joined!!", cl.Name, tchat.RED)
-		fmt.Println("User joined. name: ", cl.Name)
+		log.Printf(
+			"info: クライアント[%s]がルーム[%s]に入室した情報を配信しました。", cl.Name, room.Name)
 
 		// クライアントからのデータ受信を待つ。
 		go func() {
@@ -104,16 +122,23 @@ func serverExecute() {
 			for {
 				go room.Send(ch)
 				msg, err := tchat.Read(cl.Conn)
+				log.Printf("trace: クライアント[%s]からデータを受信しました。", cl.Name)
 				if err != nil {
-					go room.Send(ch)
+					log.Printf(
+						"trace: クライアント[%s]からエラーメッセージ(%s)を受信しました。",
+						cl.Name, err)
 					ch <- tchat.MakeMsg("Quit.", cl.Name, tchat.RED)
-					fmt.Println("User left. name: ", cl.Name)
+					log.Printf("info: クライアント[%s]が退室しました。", cl.Name)
 					room.Delete(cl)
+					log.Printf("trace: クライアント[%s]をルーム[%s]から削除しました。", cl.Name, room.Name)
 					break
 				}
 
 				//TODO 特殊な文字(ex. %L)を受信すると、ルームに在席中のメンバ一覧を表示する。
 				ch <- tchat.MakeMsg(msg, cl.Name, cl.Color)
+				log.Printf(
+					"trace: クライアント[%s]から受信したメッセージをルーム[%s]に配信しました。",
+					cl.Name, room.Name)
 			}
 		}()
 
@@ -121,13 +146,25 @@ func serverExecute() {
 }
 
 func clientExecute() {
+	// ログ定義
+	colog.SetDefaultLevel(colog.LDebug)
+	colog.SetMinLevel(colog.LTrace)
+	colog.SetFormatter(&colog.StdFormatter{
+		Flag:        log.Ldate | log.Ltime | log.Lshortfile,
+		HeaderPlain: nil,
+		HeaderColor: nil,
+		Colors:      true,
+		NoColors:    false,
+	})
+	colog.Register()
+
 	// URIの解決
 	tcpAddr, err := net.ResolveTCPAddr("tcp4", URI)
-	chkErr(err, "tcpAddr")
+	chkErr(err)
 
 	// chatサーバへの接続
 	conn, err := net.DialTCP("tcp", nil, tcpAddr)
-	chkErr(err, "DialTCP")
+	chkErr(err)
 	defer conn.Close()
 
 	// 接続状態を構造体にセット
@@ -140,7 +177,7 @@ func clientExecute() {
 
 	// chatサーバへのデータ送信(クライアントの名前)
 	err = connection.SendToServer(name)
-	chkErr(err, "Write name")
+	chkErr(err)
 
 	// chatサーバからメッセージを受信すると、標準出力に反映するためのゴルーチン
 	go func() {
@@ -192,9 +229,9 @@ func getName(conn net.Conn) (string, error) {
 	return string(buf[:n]), nil
 }
 
-func chkErr(err error, place string) {
+func chkErr(err error) {
 	if err != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "(%s) %s", place, err.Error())
+		log.Printf("error: エラーが発生しました。 [%s]", err)
 		os.Exit(1)
 	}
 }
