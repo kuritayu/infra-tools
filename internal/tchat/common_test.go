@@ -9,33 +9,33 @@ import (
 )
 
 func TestSprintColor(t *testing.T) {
-	actual_red := SprintColor("test", 31)
-	expected_red := brush.DarkRed("test").String()
-	assert.Equal(t, expected_red, actual_red)
+	actualRed := SprintColor("test", 31)
+	expectedRed := brush.DarkRed("test").String()
+	assert.Equal(t, expectedRed, actualRed)
 
-	actual_green := SprintColor("test", 32)
-	expected_green := brush.DarkGreen("test").String()
-	assert.Equal(t, expected_green, actual_green)
+	actualGreen := SprintColor("test", 32)
+	expectedGreen := brush.DarkGreen("test").String()
+	assert.Equal(t, expectedGreen, actualGreen)
 
-	actual_yellow := SprintColor("test", 33)
-	expected_yellow := brush.DarkYellow("test").String()
-	assert.Equal(t, expected_yellow, actual_yellow)
+	actualYellow := SprintColor("test", 33)
+	expectedYellow := brush.DarkYellow("test").String()
+	assert.Equal(t, expectedYellow, actualYellow)
 
-	actual_blue := SprintColor("test", 34)
-	expected_blue := brush.DarkBlue("test").String()
-	assert.Equal(t, expected_blue, actual_blue)
+	actualBlue := SprintColor("test", 34)
+	expectedBlue := brush.DarkBlue("test").String()
+	assert.Equal(t, expectedBlue, actualBlue)
 
-	actual_purple := SprintColor("test", 35)
-	expected_purple := brush.DarkPurple("test").String()
-	assert.Equal(t, expected_purple, actual_purple)
+	actualPurple := SprintColor("test", 35)
+	expectedPurple := brush.DarkPurple("test").String()
+	assert.Equal(t, expectedPurple, actualPurple)
 
-	actual_cyan := SprintColor("test", 36)
-	expected_cyan := brush.DarkCyan("test").String()
-	assert.Equal(t, expected_cyan, actual_cyan)
+	actualCyan := SprintColor("test", 36)
+	expectedCyan := brush.DarkCyan("test").String()
+	assert.Equal(t, expectedCyan, actualCyan)
 
-	actual_other := SprintColor("test", 37)
-	expected_other := "test"
-	assert.Equal(t, expected_other, actual_other)
+	actualOther := SprintColor("test", 37)
+	expectedOther := "test"
+	assert.Equal(t, expectedOther, actualOther)
 
 }
 
@@ -55,7 +55,7 @@ func TestMakeMsg(t *testing.T) {
 }
 
 func TestMakeBuffer(t *testing.T) {
-	actual := makeBuffer()
+	actual := MakeBuffer()
 	expected := make([]byte, 560)
 	assert.Equal(t, expected, actual)
 }
