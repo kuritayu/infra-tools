@@ -41,3 +41,15 @@ func TestRoom_Delete(t *testing.T) {
 	expected := 0
 	assert.Equal(t, expected, actual)
 }
+
+func TestRoom_Show(t *testing.T) {
+	room := NewRoom("PUBLIC")
+	client1 := NewClient(new(MockConn), "TEST-USER1")
+	client2 := NewClient(new(MockConn), "TEST-USER2")
+	room.Add(client1)
+	room.Add(client2)
+	actual := len(room.Show())
+	expected := 2
+	assert.Equal(t, expected, actual)
+
+}

@@ -36,3 +36,14 @@ func (r *room) Send(ch <-chan []byte) {
 		}
 	}
 }
+
+// Showはルームに在席中のクライアントリストを返却する。
+func (r *room) Show() []string {
+	var clientList []string
+	for cl, status := range r.clients {
+		if status {
+			clientList = append(clientList, cl.Name)
+		}
+	}
+	return clientList
+}
