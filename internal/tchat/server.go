@@ -18,5 +18,3 @@ func NewClient(conn net.Conn, name string) *Client {
 		Color: getColor(),
 	}
 }
-
-//TODO Quit時はroomから削除しておく必要がある。
