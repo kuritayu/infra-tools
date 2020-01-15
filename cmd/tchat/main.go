@@ -138,10 +138,10 @@ func clientExecute() {
 	err = connection.SendToServer(name)
 	chkErr(err, "Write name")
 
-	for connection.Status {
-		// chatサーバからメッセージを受信すると、標準出力に反映するためのゴルーチン
-		go func() {
-			// chatサーバからデータを受信
+	// chatサーバからメッセージを受信すると、標準出力に反映するためのゴルーチン
+	go func() {
+		// chatサーバからデータを受信
+		for connection.Status {
 			msg, err := tchat.Read(connection.Conn)
 			if err != nil {
 				connection.Status = false
@@ -149,30 +149,31 @@ func clientExecute() {
 
 			// 標準出力に書き込み
 			fmt.Println(msg)
-		}()
+		}
+	}()
 
-		// chatサーバにメッセージを送信するためにゴルーチン
-		//TODO 放置しておくとソケットを使い切ってしまい、落ちる(最重要)
-		go func() {
-			reader := bufio.NewReader(os.Stdin)
-			for {
+	// chatサーバにメッセージを送信するためにゴルーチン
+	go func() {
+		reader := bufio.NewReader(os.Stdin)
+		for {
 
-				// 標準入力からメッセージを取得
-				input, _, _ := reader.ReadLine()
-				if string(input) == ESCAPESTRING {
-					connection.Status = false
-					break
-				}
-
-				// chatサーバへのデータ送信
-				err := connection.SendToServer(input)
-				if err != nil {
-					connection.Status = false
-					break
-				}
+			// 標準入力からメッセージを取得
+			input, _, _ := reader.ReadLine() // ここがクローズされていないからと思われる
+			if string(input) == ESCAPESTRING {
+				connection.Status = false
+				break
 			}
-		}()
 
+			// chatサーバへのデータ送信
+			err := connection.SendToServer(input)
+			if err != nil {
+				connection.Status = false
+				break
+			}
+		}
+	}()
+
+	for connection.Status {
 		// メッセージ送信、受信用の待ち処理
 		time.Sleep(time.Microsecond)
 	}
