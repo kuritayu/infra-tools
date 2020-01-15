@@ -91,7 +91,22 @@ func serverExecute() {
 		fmt.Println("User joined. name: ", cl.Name)
 
 		// クライアントからのデータ受信を待つ。
-		go cl.Read(room)
+		//go cl.Read(room)
+		go func() {
+			ch := make(chan []byte)
+			for {
+				go room.Send(ch)
+				msg, err := cl.Read()
+				if err != nil {
+					go room.Send(ch)
+					ch <- tchat.MakeMsg("Quit.", cl.Name, tchat.RED)
+					fmt.Println("User left. name: ", cl.Name)
+					break
+				}
+				ch <- tchat.MakeMsg(msg, cl.Name, cl.Color)
+			}
+		}()
+
 	}
 }
 

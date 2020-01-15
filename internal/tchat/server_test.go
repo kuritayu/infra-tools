@@ -12,7 +12,7 @@ func TestCreateClient(t *testing.T) {
 	expected := &Client{
 		Name:  "test",
 		conn:  testConn,
-		color: actual.color,
+		Color: actual.Color,
 	}
 	assert.Equal(t, expected, actual)
 }
