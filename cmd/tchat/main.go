@@ -91,7 +91,6 @@ func serverExecute() {
 		fmt.Println("User joined. name: ", cl.Name)
 
 		// クライアントからのデータ受信を待つ。
-		//go cl.Read(room)
 		go func() {
 			ch := make(chan []byte)
 			for {
