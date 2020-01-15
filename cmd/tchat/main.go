@@ -100,6 +100,7 @@ func serverExecute() {
 					go room.Send(ch)
 					ch <- tchat.MakeMsg("Quit.", cl.Name, tchat.RED)
 					fmt.Println("User left. name: ", cl.Name)
+					room.Delete(cl)
 					break
 				}
 				ch <- tchat.MakeMsg(msg, cl.Name, cl.Color)
