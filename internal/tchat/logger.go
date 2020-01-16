@@ -26,9 +26,17 @@ func ChkErr(err error) {
 	}
 }
 
-func PrintResolveTCPAddr()     { log.Printf("trace: URIの解決が完了しました。") }
-func PrintListenTCP()          { log.Printf("info: リッスンを開始しました。") }
-func PrintNewRoom(name string) { log.Printf("info: ルーム[%s]を作成しました。", name) }
+func PrintResolveTCPAddr() {
+	log.Printf("trace: URIの解決が完了しました。")
+}
+
+func PrintListenTCP() {
+	log.Printf("info: リッスンを開始しました。")
+}
+
+func PrintNewRoom(name string) {
+	log.Printf("info: ルーム[%s]を作成しました。", name)
+}
 
 func PrintEstablishedConnection(addr net.Addr) {
 	log.Printf("info: コネクションが確立されました。接続元: %s", addr)
