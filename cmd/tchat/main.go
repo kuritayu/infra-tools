@@ -50,7 +50,7 @@ func main() {
 
 func serverExecute() {
 	// ログ定義
-	tchat.Define()
+	tchat.LogDefine()
 
 	// URIの解決
 	tcpAddr, err := net.ResolveTCPAddr("tcp4", URI)
@@ -63,9 +63,6 @@ func serverExecute() {
 	tchat.PrintListenTCP()
 
 	// ルーム作成
-	// 現時点ではサーバ起動時に"PUBLIC"ルームを常に作成している。
-	// 最終形は、クライアントからルーム名を受け取り、該当のルームがなければ作成、
-	// あれば既存のルームに参加するようにする
 	room := tchat.NewRoom(ROOMNAME)
 	tchat.PrintNewRoom(ROOMNAME)
 
@@ -85,8 +82,6 @@ func serverExecute() {
 		}
 		tchat.PrintGetClientName(name)
 
-		//TODO ここでルーム名をクライアントから受け取る。
-
 		// クライアント情報を生成する。
 		cl := tchat.NewClient(conn, name)
 		tchat.PrintNewClient(cl.Name)
@@ -103,6 +98,7 @@ func serverExecute() {
 
 		// クライアントからのデータ受信を待つ。
 		go func() {
+			tchat.LogDefine()
 			ch := make(chan []byte)
 			for {
 				go room.Send(ch)
@@ -117,7 +113,6 @@ func serverExecute() {
 					break
 				}
 
-				//TODO 特殊な文字(ex. %L)を受信すると、ルームに在席中のメンバ一覧を表示する。
 				ch <- tchat.MakeMsg(msg, cl.Name, cl.Color)
 				tchat.PrintSendMessage(cl.Name, room.Name)
 			}
@@ -128,7 +123,7 @@ func serverExecute() {
 
 func clientExecute() {
 	// ログ定義
-	tchat.Define()
+	tchat.LogDefine()
 
 	// URIの解決
 	tcpAddr, err := net.ResolveTCPAddr("tcp4", URI)
@@ -153,6 +148,9 @@ func clientExecute() {
 
 	// chatサーバからメッセージを受信すると、標準出力に反映するためのゴルーチン
 	go func() {
+		// ログ定義
+		tchat.LogDefine()
+
 		// chatサーバからデータを受信
 		for connection.Status {
 			msg, err := tchat.Read(connection.Conn)
@@ -167,6 +165,9 @@ func clientExecute() {
 
 	// chatサーバにメッセージを送信するためにゴルーチン
 	go func() {
+		// ログ定義
+		tchat.LogDefine()
+
 		reader := bufio.NewReader(os.Stdin)
 		for {
 

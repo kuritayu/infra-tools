@@ -4,9 +4,10 @@ import (
 	"github.com/comail/colog"
 	"log"
 	"net"
+	"os"
 )
 
-func Define() {
+func LogDefine() {
 	colog.SetDefaultLevel(colog.LDebug)
 	colog.SetMinLevel(colog.LTrace)
 	colog.SetFormatter(&colog.StdFormatter{
@@ -24,6 +25,17 @@ func ChkErr(err error) {
 	if err != nil {
 		log.Printf("error: エラーが発生しました。 [%s]", err)
 	}
+}
+
+func saveMessage(b []byte) error {
+	f, err := os.OpenFile("message.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	log.SetOutput(f)
+	log.Println(string(b))
+	return nil
 }
 
 func PrintResolveTCPAddr() {

@@ -34,6 +34,7 @@ func (r *room) Send(ch <-chan []byte) {
 			}
 		}
 	}
+	_ = saveMessage(msg)
 }
 
 // Showはルームに在席中のクライアントリストを返却する。
