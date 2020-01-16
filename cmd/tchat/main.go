@@ -98,7 +98,6 @@ func serverExecute() {
 
 		// クライアントからのデータ受信を待つ。
 		go func() {
-			tchat.LogDefine()
 			ch := make(chan []byte)
 			for {
 				go room.Send(ch)
@@ -148,9 +147,6 @@ func clientExecute() {
 
 	// chatサーバからメッセージを受信すると、標準出力に反映するためのゴルーチン
 	go func() {
-		// ログ定義
-		tchat.LogDefine()
-
 		// chatサーバからデータを受信
 		for connection.Status {
 			msg, err := tchat.Read(connection.Conn)
@@ -165,9 +161,6 @@ func clientExecute() {
 
 	// chatサーバにメッセージを送信するためにゴルーチン
 	go func() {
-		// ログ定義
-		tchat.LogDefine()
-
 		reader := bufio.NewReader(os.Stdin)
 		for {
 

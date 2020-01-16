@@ -42,7 +42,7 @@ func TestSprintColor(t *testing.T) {
 
 func TestGetTime(t *testing.T) {
 	actual := getTime()
-	expected := time.Now().Format("15:04")
+	expected := time.Now().Format("2006-01-02 15:04")
 	assert.Equal(t, expected, actual)
 }
 
