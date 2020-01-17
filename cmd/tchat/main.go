@@ -16,14 +16,18 @@ func main() {
 		&cli.BoolFlag{
 			Name: "c",
 		},
+		&cli.IntFlag{
+			Name:  "p",
+			Value: 7777,
+		},
 	}
 
-	//TODO port番号は指定できるようにしたい
 	app.Action = func(c *cli.Context) error {
+		port := c.Int("p")
 		if c.Bool("c") {
-			tchat.ClientExecute()
+			tchat.ClientExecute(port)
 		} else {
-			tchat.ServerExecute()
+			tchat.ServerExecute(port)
 		}
 
 		return nil

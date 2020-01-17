@@ -18,11 +18,11 @@ const (
 	CYAN         = 36
 )
 
-var (
-	SERVER = "127.0.0.1"
-	PORT   = "7777"
-	URI    = fmt.Sprintf("%s:%s", SERVER, PORT)
-)
+const SERVER = "127.0.0.1"
+
+func getURI(port int) string {
+	return fmt.Sprintf("%s:%d", SERVER, port)
+}
 
 func SprintColor(msg string, color int) string {
 	switch color {

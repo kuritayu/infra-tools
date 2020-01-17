@@ -8,9 +8,9 @@ import (
 	"time"
 )
 
-func ClientExecute() {
+func ClientExecute(port int) {
 	// URIの解決
-	tcpAddr, err := net.ResolveTCPAddr("tcp4", URI)
+	tcpAddr, err := net.ResolveTCPAddr("tcp4", getURI(port))
 	ChkErr(err)
 
 	// chatサーバへの接続

@@ -24,6 +24,7 @@ func ChkErr(err error) {
 	logDefine()
 	if err != nil {
 		log.Printf("error: エラーが発生しました。 [%s]", err)
+		os.Exit(1)
 	}
 }
 
