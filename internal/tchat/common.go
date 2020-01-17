@@ -18,6 +18,12 @@ const (
 	CYAN         = 36
 )
 
+var (
+	SERVER = "127.0.0.1"
+	PORT   = "7777"
+	URI    = fmt.Sprintf("%s:%s", SERVER, PORT)
+)
+
 func SprintColor(msg string, color int) string {
 	switch color {
 	case RED:
