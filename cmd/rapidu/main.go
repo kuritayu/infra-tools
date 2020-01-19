@@ -19,6 +19,7 @@ func main() {
 		roots = []string{"."}
 	}
 
+	//TODO クロージャをラップする関数作りたい
 	sizes := make(chan int64)
 	var n sync.WaitGroup
 	for _, root := range roots {
