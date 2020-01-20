@@ -19,7 +19,6 @@ func main() {
 		roots = []string{"."}
 	}
 
-	//TODO クロージャをラップする関数作りたい
 	sizes := make(chan int64)
 	var n sync.WaitGroup
 	for _, root := range roots {
@@ -32,11 +31,6 @@ func main() {
 		close(sizes)
 	}()
 
-	//go func() {
-	//	os.Stdin.Read(make([]byte, 1))
-	//	close(rapidu.Done)
-	//}()
-
 	var tick <-chan time.Time
 	if *verbose {
 		tick = time.Tick(500 * time.Millisecond)
@@ -46,10 +40,6 @@ func main() {
 loop:
 	for {
 		select {
-		case <-rapidu.Done:
-			for range sizes {
-			}
-			return
 		case size, ok := <-sizes:
 			if !ok {
 				break loop
