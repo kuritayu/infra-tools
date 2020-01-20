@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/kuritayu/infra-tools/internal/rapidu"
+	"os"
 	"sync"
 	"time"
 )
@@ -19,12 +20,15 @@ func main() {
 		roots = []string{"."}
 	}
 
+	if len(roots) > 1 {
+		printUsage()
+	}
+
 	sizes := make(chan int64)
 	var n sync.WaitGroup
-	for _, root := range roots {
-		n.Add(1)
-		go rapidu.Walk(root, &n, sizes)
-	}
+	root := roots[0]
+	n.Add(1)
+	go rapidu.Walk(root, &n, sizes)
 
 	go func() {
 		n.Wait()
@@ -47,9 +51,14 @@ loop:
 			nfiles++
 			total += size
 		case <-tick:
-			fmt.Print(rapidu.PrintDiskUsage(nfiles, total))
+			fmt.Print(rapidu.PrintDiskUsage(root, nfiles, total))
 		}
 	}
 
-	fmt.Print(rapidu.PrintDiskUsage(nfiles, total))
+	fmt.Print(rapidu.PrintDiskUsage(root, nfiles, total))
+}
+
+func printUsage() {
+	flag.Usage()
+	os.Exit(1)
 }

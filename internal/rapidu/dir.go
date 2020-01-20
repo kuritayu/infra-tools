@@ -40,6 +40,7 @@ func Walk(dir string, n *sync.WaitGroup, sizes chan<- int64) {
 	}
 }
 
-func PrintDiskUsage(nfiles, nbytes int64) string {
-	return fmt.Sprintf("%d files %.1f MB\n", nfiles, float64(nbytes)/1e6)
+func PrintDiskUsage(path string, nfiles, nbytes int64) string {
+	abs, _ := filepath.Abs(path)
+	return fmt.Sprintf("%s %d files %.1f MB\n", abs, nfiles, float64(nbytes)/1e6)
 }

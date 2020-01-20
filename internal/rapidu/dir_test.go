@@ -18,10 +18,9 @@ func TestWalk(t *testing.T) {
 	roots := []string{".."}
 	sizes := make(chan int64)
 	var n sync.WaitGroup
-	for _, root := range roots {
-		n.Add(1)
-		go Walk(root, &n, sizes)
-	}
+	root := roots[0]
+	n.Add(1)
+	go Walk(root, &n, sizes)
 
 	go func() {
 		n.Wait()
@@ -34,8 +33,8 @@ func TestWalk(t *testing.T) {
 		total += size
 	}
 
-	actual := PrintDiskUsage(nfiles, total)
-	expected := "29 files 0.0 MB\n"
+	actual := PrintDiskUsage(root, nfiles, total)
+	expected := "/Users/kuritayu/go/src/github.com/kuritayu/infra-tools/internal 29 files 0.0 MB\n"
 	assert.Equal(t, expected, actual)
 
 }
