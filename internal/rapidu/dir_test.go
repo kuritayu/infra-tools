@@ -34,7 +34,7 @@ func TestWalk(t *testing.T) {
 	}
 
 	actual := PrintDiskUsage(root, nfiles, total)
-	expected := "/Users/kuritayu/go/src/github.com/kuritayu/infra-tools/internal 29 files 0.0 MB\n"
+	expected := "/Users/kuritayu/go/src/github.com/kuritayu/infra-tools/internal 31 files 0.0 MB\n"
 	assert.Equal(t, expected, actual)
 
 }
