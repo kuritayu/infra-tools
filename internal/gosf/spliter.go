@@ -18,14 +18,14 @@ const (
 )
 
 type Config struct {
-	separator string
+	Separator string
 }
 
-func NewConfig() *Config {
-	return &Config{separator: " "}
+func NewConfig(sep string) *Config {
+	return &Config{Separator: sep}
 }
 
-func Concat(str string, config *Config, fields ...string) (string, error) {
+func Concat(str string, config *Config, fields []string) (string, error) {
 	var result []string
 	for _, field := range fields {
 		target, err := SelectField(str, field, config)
@@ -34,7 +34,7 @@ func Concat(str string, config *Config, fields ...string) (string, error) {
 		}
 		result = append(result, target)
 	}
-	return strings.Join(result, config.separator), nil
+	return strings.Join(result, config.Separator), nil
 }
 
 func SelectField(str string, field string, config *Config) (string, error) {
@@ -42,7 +42,7 @@ func SelectField(str string, field string, config *Config) (string, error) {
 		return str, nil
 	}
 
-	s := strings.Split(str, config.separator)
+	s := strings.Split(str, config.Separator)
 
 	if field == LAST {
 		return s[len(s)-END], nil
@@ -57,5 +57,11 @@ func SelectField(str string, field string, config *Config) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
+	// 指定されたフィールドが与えられた文字列のフィールド数より大きい場合は空白を返す
+	if len(s) < i {
+		return "", nil
+	}
+
 	return s[i-END], nil
 }
