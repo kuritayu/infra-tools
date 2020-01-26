@@ -25,9 +25,17 @@ func NewConfig() *Config {
 	return &Config{separator: " "}
 }
 
-//TODO 複数フィールドであることを考慮して、可変長引数を受け取る関数にする
-//forループでSelectFieldを呼び出し、strings.join()で結合するイメージ
-//フィールド数が1であってもSelectFieldを呼び出す
+func Concat(str string, config *Config, fields ...string) (string, error) {
+	var result []string
+	for _, field := range fields {
+		target, err := SelectField(str, field, config)
+		if err != nil {
+			return "", err
+		}
+		result = append(result, target)
+	}
+	return strings.Join(result, config.separator), nil
+}
 
 func SelectField(str string, field string, config *Config) (string, error) {
 	if field == ALL {
