@@ -1,6 +1,8 @@
 package pkg
 
 import (
+	"bufio"
+	"io"
 	"io/ioutil"
 	"regexp"
 )
@@ -31,4 +33,11 @@ func Sed(data string, from string, to string) string {
 	return data
 }
 
-//TODO cat
+func Cat(data io.Reader) []string {
+	var result []string
+	scanner := bufio.NewScanner(data)
+	for scanner.Scan() {
+		result = append(result, scanner.Text())
+	}
+	return result
+}
