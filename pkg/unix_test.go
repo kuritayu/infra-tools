@@ -25,8 +25,28 @@ func TestSed(t *testing.T) {
 }
 
 func TestCat(t *testing.T) {
-	f, _ := os.Open(".gitkeep")
+	f, _ := os.Open("../README.md")
 	actual := len(Cat(f))
-	expected := 0
+	expected := 7
+	assert.Equal(t, expected, actual)
+}
+
+func TestCut(t *testing.T) {
+	actual := Cut("1 2 3", " ", 3, 1)
+	expected := "3 1"
+	assert.Equal(t, expected, actual)
+}
+
+func TestWc(t *testing.T) {
+	data := []string{"a b c", "a b c", "a b c"}
+	actual := Wc(data)
+	expected := 3
+	assert.Equal(t, expected, actual)
+}
+
+func TestUniq(t *testing.T) {
+	data := []string{"a b c", "a b c", "a b c"}
+	actual := len(Uniq(data))
+	expected := 1
 	assert.Equal(t, expected, actual)
 }
