@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+// 指定されたパスのファイルリストを返します。
 func Ls(path string) ([]string, error) {
 	files, err := ioutil.ReadDir(path)
 	var result []string
@@ -17,6 +18,7 @@ func Ls(path string) ([]string, error) {
 	return result, err
 }
 
+// 入力データにキーワードが含まれていれば入力データを返します。
 func Grep(data string, keyword string) string {
 	result := ""
 	r := regexp.MustCompile(keyword)
@@ -26,6 +28,7 @@ func Grep(data string, keyword string) string {
 	return result
 }
 
+// 入力データからfromの文字をtoに置換して返します。
 func Sed(data string, from string, to string) string {
 	r := regexp.MustCompile(from)
 	if r.MatchString(data) {
@@ -34,6 +37,7 @@ func Sed(data string, from string, to string) string {
 	return data
 }
 
+// 入力データを読み込み、スライスで返します。
 func Cat(data io.Reader) []string {
 	var result []string
 	scanner := bufio.NewScanner(data)
@@ -43,6 +47,7 @@ func Cat(data io.Reader) []string {
 	return result
 }
 
+// 入力データをセパレータで分割し、指定されたフィールドを抽出して返します。
 func Cut(data string, separator string, fields ...int) string {
 	var result []string
 	for _, field := range fields {
@@ -51,10 +56,13 @@ func Cut(data string, separator string, fields ...int) string {
 	return strings.Join(result, separator)
 }
 
+// スライスの要素数(行数)を返します。
 func Wc(data []string) int {
 	return len(data)
 }
 
+// 引数のスライスから重複要素を削除したスライスを返します。
+// uniqコマンドと違い、スライスがソートされていなくても削除します。
 func Uniq(data []string) []string {
 	counter := make(map[string]bool)
 	var result []string
