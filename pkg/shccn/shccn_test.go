@@ -13,6 +13,11 @@ func TestNew(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+func TestNew2(t *testing.T) {
+	_, err := New("../../test/test.sha")
+	assert.Error(t, err)
+}
+
 func TestFileContents_TestGetLines(t *testing.T) {
 	testContents, err := New("../../test/test.sh")
 	assert.NoError(t, err)
