@@ -176,27 +176,27 @@ func TestIsCommentLine3(t *testing.T) {
 }
 
 func TestIsFunctionLine(t *testing.T) {
-	actual := isFunctionLine("function testA() {")
+	actual := isFunctionLine("function testA() {", true)
 	assert.True(t, actual)
 }
 
 func TestIsFunctionLine2(t *testing.T) {
-	actual := isFunctionLine("testA() {")
+	actual := isFunctionLine("testA() {", true)
 	assert.True(t, actual)
 }
 
 func TestIsFunctionLine3(t *testing.T) {
-	actual := isFunctionLine("testA(){")
+	actual := isFunctionLine("testA(){", true)
 	assert.True(t, actual)
 }
 
 func TestIsFunctionLine4(t *testing.T) {
-	actual := isFunctionLine("$(${aaaa})")
+	actual := isFunctionLine("$(${aaaa})", true)
 	assert.False(t, actual)
 }
 
 func TestIsFunctionLine5(t *testing.T) {
-	actual := isFunctionLine("'testA(){'")
+	actual := isFunctionLine("'testA(){'", true)
 	assert.False(t, actual)
 }
 
@@ -209,6 +209,12 @@ func TestRemoveQuote(t *testing.T) {
 func TestRemoveQuote2(t *testing.T) {
 	actual := removeQuote(`'aaaaaaaaa'bbb'cccccccc'`)
 	expected := `bbb`
+	assert.Equal(t, expected, actual)
+}
+
+func TestRemoveQuote3(t *testing.T) {
+	actual := removeQuote(`echo '${script_name} s|p'`)
+	expected := `echo `
 	assert.Equal(t, expected, actual)
 }
 
@@ -235,7 +241,7 @@ func TestIntegration(t *testing.T) {
 	assert.NoError(t, err)
 	fmt.Print(BuildSummaryHeader())
 	fmt.Print(BuildSummaryBody(tc.Name, lines, codes, comments, blanks, functions))
-	fmt.Print(BuildSummaryFooter())
+	fmt.Print(BuildFooter())
 
 	fmt.Print(BuildFunctionHeader())
 	for _, k := range sl {
@@ -244,5 +250,5 @@ func TestIntegration(t *testing.T) {
 		ccn := CalculateCCN(functionCodes[k])
 		fmt.Print(BuildFunctionBody(tc.Name, name, code, ccn))
 	}
-	fmt.Print(BuildFunctionFooter())
+	fmt.Print(BuildFooter())
 }

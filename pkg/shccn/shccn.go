@@ -15,15 +15,8 @@ type FileContents struct {
 	Lines []string
 }
 
-// TODO この正規表現達をローカル変数化するためのヘルパーメソッドを作ること
-var (
-	separator         = strings.Repeat("-", 80)                 // サマリレポートのセパレータ文字列
-	functionEndExp    = regexp.MustCompile(`}`)                 // 関数行(終了)の正規表現
-	functionNotEndExp = regexp.MustCompile(`.*'.*}.*|.*".*}.*`) // 関数行(終了)と見なさない正規表現
-	ccnExp            = regexp.MustCompile(`if|while|for|;;`)   // CCNでカウントアップするための正規表現
-	NotCcnExp         = regexp.MustCompile(`.*'.*if|.*".*if|.*'.*while|.*".*while|.*'.*for|.*".*for`)
-	conditionExp      = regexp.MustCompile(`&&|\|\|`) // CCNでカウントアップするための正規表現
-)
+// サマリレポートのセパレータ文字列
+var separator = strings.Repeat("-", 80)
 
 // ファイルの行数を返却する
 func (fc *FileContents) GetLines() int {
@@ -65,7 +58,7 @@ func (fc *FileContents) GetCodeLines() int {
 // ファイルの関数の数を返却する
 func (fc *FileContents) GetFunctionLines() (count int) {
 	for _, v := range fc.Lines {
-		if isFunctionLine(v) {
+		if isFunctionLine(v, true) {
 			count++
 		}
 	}
@@ -98,17 +91,26 @@ func toSlice(path string) (result []string, err error) {
 		result = append(result, scanner.Text())
 	}
 
-	//TODO "\"を含む行があれば、前の行と結合したスライスも作りたい
 	return result, nil
 }
 
 // ファイルの内容からコメント行、空白行を削除したスライスを作成する
 func GetCodes(code []string) (result []string) {
-	for _, v := range code {
+	exp := regexp.MustCompile(`\\s*$`)
+	flag := false
+	for i, v := range code {
 		if isCommentLine(v) {
 			continue
 		}
 		if isBlankLine(v) {
+			continue
+		}
+		if flag {
+			v = code[i-1] + v
+			flag = false
+		}
+		if exp.MatchString(v) {
+			flag = true
 			continue
 		}
 		result = append(result, v)
@@ -125,11 +127,7 @@ func GetFunctions(code []string) map[string][]string {
 		// 関数フラグが立っている場合、要素は無条件に追加してよい
 		// ただし}が含まれていれば、関数フラグをfalseにしておく
 		if flag {
-			if functionEndExp.MatchString(v) {
-				if functionNotEndExp.MatchString(v) {
-					result[funcname] = append(result[funcname], v)
-					continue
-				}
+			if isFunctionLine(v, false) {
 				flag = false
 				funcname = ""
 				continue
@@ -140,7 +138,7 @@ func GetFunctions(code []string) map[string][]string {
 
 		// 関数フラグが立っていない場合
 		// {が含まれていれば、要素を追加してよい
-		if isFunctionLine(v) {
+		if isFunctionLine(v, true) {
 			funcname = GetFunctionName(v)
 			flag = true
 			continue
@@ -174,19 +172,23 @@ func BuildSummaryBody(name string, lines, code, comments, blanks, functions int)
 		name, lines, code, comments, blanks, functions)
 }
 
-// サマリのフッタ部を組み立てる
-func BuildSummaryFooter() string {
+// フッタ部を組み立てる
+func BuildFooter() string {
 	return fmt.Sprintf("%s\n", separator)
 }
 
 // サイクロマティック複雑度を算出する
 func CalculateCCN(code []string) (result int) {
 	result = 1
+	ccnExp := regexp.MustCompile(`if|while|for|;;`)
+	conditionExp := regexp.MustCompile(`&&|\|\|`)
 	for _, v := range code {
+		tmp := strings.Replace(v, `"`, `'`, -1)
+		if strings.Contains(tmp, `'`) {
+			v = removeQuote(tmp)
+		}
+
 		if ccnExp.MatchString(v) {
-			if NotCcnExp.MatchString(v) {
-				continue
-			}
 			result++
 		}
 
@@ -213,11 +215,6 @@ func BuildFunctionBody(script, name string, code, ccn int) string {
 		name+"@"+script, code, ccn)
 }
 
-// 関数のフッタ部を組み立てる
-func BuildFunctionFooter() string {
-	return fmt.Sprintf("%s\n", separator)
-}
-
 // 空行かどうか判定する
 func isBlankLine(line string) bool {
 	tmp := strings.Replace(line, " ", "", -1)
@@ -237,13 +234,20 @@ func isCommentLine(line string) bool {
 }
 
 // 関数行かどうか判定する
-func isFunctionLine(line string) bool {
+func isFunctionLine(line string, flag bool) bool {
 	tmp := strings.Replace(line, `"`, `'`, -1)
 	if strings.Contains(tmp, `'`) {
-		line = removeQuote(line)
+		line = removeQuote(tmp)
 	}
-	functionStartExp := regexp.MustCompile(`.*\(\s*\)\s*{`)
-	if functionStartExp.MatchString(line) {
+
+	// flagがtrueの場合は関数が開始かどうか、falseの場合は終了かどうか
+	exp := `}`
+	if flag {
+		exp = `.*\(\s*\)\s*{`
+	}
+
+	functionExp := regexp.MustCompile(exp)
+	if functionExp.MatchString(line) {
 		return true
 	}
 	return false

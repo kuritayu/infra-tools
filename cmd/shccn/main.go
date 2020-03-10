@@ -39,7 +39,7 @@ func main() {
 
 	fmt.Print(shccn.BuildSummaryHeader())
 	fmt.Print(shccn.BuildSummaryBody(sh.Name, lines, codes, comments, blanks, functions))
-	fmt.Print(shccn.BuildSummaryFooter())
+	fmt.Print(shccn.BuildFooter())
 
 	fmt.Print(shccn.BuildFunctionHeader())
 	for _, k := range sl {
@@ -48,5 +48,5 @@ func main() {
 		ccn := shccn.CalculateCCN(functionCodes[k])
 		fmt.Print(shccn.BuildFunctionBody(sh.Name, name, code, ccn))
 	}
-	fmt.Print(shccn.BuildFunctionFooter())
+	fmt.Print(shccn.BuildFooter())
 }
