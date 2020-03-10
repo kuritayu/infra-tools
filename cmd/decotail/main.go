@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/kuritayu/infra-tools/internal/decotail"
-	"github.com/kuritayu/infra-tools/pkg"
+	"github.com/kuritayu/infra-tools/pkg/validator"
 	"github.com/urfave/cli"
 	"os"
 )
@@ -33,7 +33,7 @@ func main() {
 
 		target := c.Args().Get(0)
 
-		err := pkg.ValidateFile(target)
+		err := validator.ValidateFile(target)
 		if err != nil {
 			_, _ = fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)

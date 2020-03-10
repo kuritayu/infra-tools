@@ -1,4 +1,4 @@
-package pkg
+package unix
 
 import (
 	"github.com/stretchr/testify/assert"
@@ -25,7 +25,7 @@ func TestSed(t *testing.T) {
 }
 
 func TestCat(t *testing.T) {
-	f, _ := os.Open("../README.md")
+	f, _ := os.Open("../../README.md")
 	actual := len(Cat(f))
 	expected := 7
 	assert.Equal(t, expected, actual)
