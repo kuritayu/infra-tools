@@ -4,7 +4,11 @@ import (
 	"flag"
 	"fmt"
 	"github.com/kuritayu/infra-tools/pkg/shccn"
+	"io/ioutil"
 	"log"
+	"os"
+	"path/filepath"
+	"regexp"
 	"sort"
 )
 
@@ -12,41 +16,95 @@ import (
 func main() {
 	flag.Parse()
 	args := flag.Args()
+	path := args[0]
+	var targets []*shccn.FileContents
 
-	target := args[0]
-
-	// TODO 引数がディレクトリの場合
-	sh, err := shccn.New(target)
+	//パスが存在しない場合はエラー
+	stat, err := os.Stat(path)
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalln(nil)
+	}
+	isDir := false
+	if stat.IsDir() {
+		isDir = true
 	}
 
-	lines := sh.GetLines()
-	codes := sh.GetCodeLines()
-	comments := sh.GetCommentLines()
-	blanks := sh.GetBlankLines()
-	functions := sh.GetFunctionLines()
-	execCodes := shccn.GetCodes(sh.Lines)
-	functionCodes := shccn.GetFunctions(execCodes)
+	// TODO 冗長なコード
+	if isDir {
+		files, err := ioutil.ReadDir(path)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		for _, file := range files {
+			if file.IsDir() {
+				continue
+			}
+			sh, err := shccn.New(filepath.Join(path, file.Name()))
+			if err != nil {
+				continue
+			}
 
-	sl := make([]string, len(functionCodes))
+			//TODO 空ファイルのときにNPE
+			if isShell(sh.Lines[0]) {
+				targets = append(targets, sh)
+			}
+		}
+	} else {
+		sh, err := shccn.New(path)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		if isShell(sh.Lines[0]) {
+			targets = append(targets, sh)
+		}
+	}
+
+	// サマリ部分のループ
+	fmt.Print(shccn.BuildSummaryHeader())
+	for _, target := range targets {
+		lines := target.GetLines()
+		codes := target.GetCodeLines()
+		comments := target.GetCommentLines()
+		blanks := target.GetBlankLines()
+		functions := target.GetFunctionLines()
+		fmt.Print(shccn.BuildSummaryBody(target.Name, lines, codes, comments, blanks, functions))
+	}
+	fmt.Print(shccn.BuildFooter())
+
+	// 関数部分のループ
+	fmt.Print(shccn.BuildFunctionHeader())
+	for _, target := range targets {
+		execCodes := shccn.GetCodes(target.Lines)
+		functionCodes := shccn.GetFunctions(execCodes)
+		sortedKeys := sortKey(functionCodes)
+
+		for _, k := range sortedKeys {
+			name := k
+			code := len(functionCodes[k])
+			ccn := shccn.CalculateCCN(functionCodes[k])
+			fmt.Print(shccn.BuildFunctionBody(target.Name, name, code, ccn))
+		}
+	}
+	fmt.Print(shccn.BuildFooter())
+}
+
+// キーをソートする
+func sortKey(codes map[string][]string) (result []string) {
+	result = make([]string, len(codes))
 	i := 0
-	for k := range functionCodes {
-		sl[i] = k
+	for k := range codes {
+		result[i] = k
 		i++
 	}
-	sort.Strings(sl)
+	sort.Strings(result)
+	return result
+}
 
-	fmt.Print(shccn.BuildSummaryHeader())
-	fmt.Print(shccn.BuildSummaryBody(sh.Name, lines, codes, comments, blanks, functions))
-	fmt.Print(shccn.BuildFooter())
-
-	fmt.Print(shccn.BuildFunctionHeader())
-	for _, k := range sl {
-		name := k
-		code := len(functionCodes[k])
-		ccn := shccn.CalculateCCN(functionCodes[k])
-		fmt.Print(shccn.BuildFunctionBody(sh.Name, name, code, ccn))
+// 対象パスがbashかどうか判定する
+func isShell(code string) bool {
+	exp := regexp.MustCompile(`#!.*/sh|#!.*/bash|#!.* bash`)
+	if exp.MatchString(code) {
+		return true
 	}
-	fmt.Print(shccn.BuildFooter())
+	return false
 }
