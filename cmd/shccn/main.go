@@ -24,68 +24,61 @@ func main() {
 	if err != nil {
 		log.Fatalln(nil)
 	}
+
+	// 指定されたパスがディレクトリかどうか判定する
 	isDir := false
 	if stat.IsDir() {
 		isDir = true
 	}
 
-	// TODO 冗長なコード
-	if isDir {
-		files, err := ioutil.ReadDir(path)
-		if err != nil {
-			log.Fatalln(err)
-		}
-		for _, file := range files {
-			if file.IsDir() {
-				continue
-			}
-			sh, err := shccn.New(filepath.Join(path, file.Name()))
-			if err != nil {
-				continue
-			}
+	// ファイルリストを作成する
+	files, err := createFileList(path, isDir)
+	if err != nil {
+		log.Fatalln(err)
+	}
 
-			//TODO 空ファイルのときにNPE
-			if isShell(sh.Lines[0]) {
-				targets = append(targets, sh)
-			}
+	for _, file := range files {
+		if file.IsDir() {
+			continue
 		}
-	} else {
-		sh, err := shccn.New(path)
+
+		var sh *shccn.FileContents
+		switch isDir {
+		case true:
+			sh, err = shccn.New(filepath.Join(path, file.Name()))
+		case false:
+			sh, err = shccn.New(filepath.Join(filepath.Dir(path), file.Name()))
+		}
 		if err != nil {
-			log.Fatalln(err)
+			continue
 		}
-		if isShell(sh.Lines[0]) {
+
+		if len(sh.Lines) != 0 && isShell(sh.Lines[0]) {
 			targets = append(targets, sh)
 		}
 	}
 
-	// サマリ部分のループ
-	fmt.Print(shccn.BuildSummaryHeader())
-	for _, target := range targets {
-		lines := target.GetLines()
-		codes := target.GetCodeLines()
-		comments := target.GetCommentLines()
-		blanks := target.GetBlankLines()
-		functions := target.GetFunctionLines()
-		fmt.Print(shccn.BuildSummaryBody(target.Name, lines, codes, comments, blanks, functions))
+	if len(targets) > 0 {
+		printSummary(targets)
+		printDetail(targets)
 	}
-	fmt.Print(shccn.BuildFooter())
+}
 
-	// 関数部分のループ
-	fmt.Print(shccn.BuildFunctionHeader())
-	for _, target := range targets {
-		execCodes := shccn.GetCodes(target.Lines)
-		functionCodes := shccn.GetFunctions(execCodes)
-		sortedKeys := sortKey(functionCodes)
-
-		for _, k := range sortedKeys {
-			name := k
-			code := len(functionCodes[k])
-			ccn := shccn.CalculateCCN(functionCodes[k])
-			fmt.Print(shccn.BuildFunctionBody(target.Name, name, code, ccn))
+// ファイルリストを作成する
+func createFileList(path string, isDir bool) (files []os.FileInfo, err error) {
+	if isDir {
+		files, err = ioutil.ReadDir(path)
+		if err != nil {
+			return nil, err
 		}
+	} else {
+		s, err := os.Stat(path)
+		if err != nil {
+			return nil, err
+		}
+		files = append(files, s)
 	}
-	fmt.Print(shccn.BuildFooter())
+	return files, nil
 }
 
 // キーをソートする
@@ -107,4 +100,36 @@ func isShell(code string) bool {
 		return true
 	}
 	return false
+}
+
+// サマリ情報を出力する
+func printSummary(targets []*shccn.FileContents) {
+	fmt.Print(shccn.BuildSummaryHeader())
+	for _, target := range targets {
+		lines := target.GetLines()
+		codes := target.GetCodeLines()
+		comments := target.GetCommentLines()
+		blanks := target.GetBlankLines()
+		functions := target.GetFunctionLines()
+		fmt.Print(shccn.BuildSummaryBody(target.Name, lines, codes, comments, blanks, functions))
+	}
+	fmt.Print(shccn.BuildFooter())
+}
+
+// 詳細情報を出力する
+func printDetail(targets []*shccn.FileContents) {
+	fmt.Print(shccn.BuildFunctionHeader())
+	for _, target := range targets {
+		execCodes := shccn.GetCodes(target.Lines)
+		functionCodes := shccn.GetFunctions(execCodes)
+		sortedKeys := sortKey(functionCodes)
+
+		for _, k := range sortedKeys {
+			name := k
+			code := len(functionCodes[k])
+			ccn := shccn.CalculateCCN(functionCodes[k])
+			fmt.Print(shccn.BuildFunctionBody(target.Name, name, code, ccn))
+		}
+	}
+	fmt.Print(shccn.BuildFooter())
 }
