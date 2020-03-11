@@ -14,8 +14,21 @@ import (
 
 // TODO コードメトリクスを取る
 func main() {
+	// usageの定義
+	flag.Usage = func() {
+		_, _ = fmt.Fprintf(os.Stderr, "Usage: %s path \n",
+			os.Args[0])
+
+	}
+
 	flag.Parse()
 	args := flag.Args()
+
+	if len(args) != 1 {
+		flag.Usage()
+		os.Exit(1)
+	}
+
 	path := args[0]
 	var targets []*shccn.FileContents
 
