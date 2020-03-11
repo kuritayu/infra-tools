@@ -108,7 +108,7 @@ func sortKey(codes map[string][]string) (result []string) {
 
 // 対象パスがbashかどうか判定する
 func isShell(code string) bool {
-	exp := regexp.MustCompile(`#!.*/sh|#!.*/bash|#!.* bash`)
+	exp := regexp.MustCompile(`#!.*/sh|#!.*/bash|#!.* bash|#\s*shellcheck`)
 	if exp.MatchString(code) {
 		return true
 	}
